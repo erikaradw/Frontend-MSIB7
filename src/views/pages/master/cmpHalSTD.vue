@@ -1,0 +1,1243 @@
+<template>
+  <!---------------------------- Modal -->
+  <div
+    :class="modal ? 'modal fade in' : 'modal fade'"
+    id="exampleModalCenter"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true"
+    data-keyboard="false"
+    data-backdrop="true"
+    :style="modal ? 'display: block;' : 'display: none;'"
+  >
+    <div class="modal-dialog2 modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          {{ flagButtonAdd ? "ADD" : "UPDATE" }} DATA {{ $root.judulHalaman }}
+          <button
+            id="closeModal"
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+            :disabled="$root.flagButtonLoading"
+            @click="show_modal()"
+          >
+            <span aria-hidden="true">X</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- <pre>{{ todo }}</pre> -->
+          <!-- Wizards Row -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">yop</label>
+                  <CmpInputText
+                    id="inputA"
+                    type="text"
+                    placeholder="Input yop"
+                    v-model="todo.yop"
+                    :class="
+                      errorField.yop
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                    :disabled="!flagButtonAdd"
+                    @input="(val) => (todo.yop = todo.yop.toUpperCase())"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">mop</label>
+                  <CmpInputText
+                    type="text"
+                    placeholder="Input mop"
+                    v-model="todo.mop"
+                    :class="
+                      errorField.mop
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                    @input="(val) => (todo.mop = todo.mop.toUpperCase())"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">distCode</label>
+                  <input
+                    type="text"
+                    v-model="todo.distCode"
+                    :class="
+                      errorField.distCode
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                    @input="
+                      (val) => (todo.distCode = todo.distCode.toUpperCase())
+                    "
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">brchName</label>
+                  <input
+                    type="text"
+                    v-model="todo.brchName"
+                    :class="
+                      errorField.brchName
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                    @input="
+                      (val) => (todo.brchName = todo.brchName.toUpperCase())
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">itemCode</label>
+                  <input
+                    type="text"
+                    v-model="todo.itemCode"
+                    :class="
+                      errorField.itemCode
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                    @input="
+                      (val) => (todo.itemCode = todo.itemCode.toUpperCase())
+                    "
+                  />
+                </div>
+              </div>
+              <!-- Add flag_active Checkbox -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">onHandUnit</label>
+                  <input
+                    type="text"
+                    v-model="todo.onHandUnit"
+                    :class="
+                      errorField.onHandUnit
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                    @input="
+                      (val) => (todo.onHandUnit = todo.onHandUnit.toUpperCase())
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">Unit of Measure 3</label>
+                  <CmpInputText
+                    type="number"
+                    placeholder="Input Unit of Measure 3"
+                    v-model="todo.uom3"
+                    :class="
+                      errorField.uom3
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">Unit of Measure 4</label>
+                  <CmpInputText
+                    type="number"
+                    placeholder="Input Unit of Measure 4"
+                    v-model="todo.uom4"
+                    :class="
+                      errorField.uom4
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="example-nf-email">Object Type</label>
+                  <CmpInputText
+                    type="number"
+                    placeholder="Input Object Type"
+                    v-model="todo.obj_type"
+                    :class="
+                      errorField.obj_type
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- END Wizards Row -->
+        </div>
+
+        <div class="modal-footer">
+          <div class="form-group form-actions">
+            <div class="col-xs-12">
+              <button
+                v-if="flagButtonAdd"
+                @click="saveTodo()"
+                type="button"
+                class="btn btn-sm btn-primary pull-left"
+                :disabled="
+                  $root.flagButtonLoading ||
+                  todo.yop == null ||
+                  todo.yop == '' ||
+                  todo.mop == null ||
+                  todo.mop == '' ||
+                  todo.brchName == null ||
+                  todo.brchName == '' ||
+                  todo.itemCode == null ||
+                  todo.itemCode == '' ||
+                  todo.onHandUnit == null ||
+                  todo.onHandUnit == '' ||
+                  todo.distCode == null ||
+                  todo.distCode == ''
+                "
+              >
+                <i
+                  v-if="$root.flagButtonLoading"
+                  class="fa fa-spinner fa-spin text-default"
+                ></i>
+                SAVE DATA
+              </button>
+
+              <button
+                v-if="!flagButtonAdd"
+                @click="editTodo()"
+                type="button"
+                class="btn btn-sm btn-primary pull-left"
+                :disabled="
+                  $root.flagButtonLoading ||
+                  todo.yop == null ||
+                  todo.yop == '' ||
+                  todo.mop == null ||
+                  todo.mop == '' ||
+                  todo.brchName == null ||
+                  todo.brchName == '' ||
+                  todo.itemCode == null ||
+                  todo.itemCode == '' ||
+                  todo.onHandUnit == null ||
+                  todo.onHandUnit == '' ||
+                  todo.distCode == null ||
+                  todo.distCode == ''
+                "
+              >
+                <i
+                  v-if="$root.flagButtonLoading"
+                  class="fa fa-spinner fa-spin text-default"
+                ></i>
+                UPDATE DATA
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!---------------------------- Modal -->
+
+  <!-- Page content -->
+  <div id="page-content" v-if="isLogin == 1" style="min-height: 850px">
+    <!-- END Visible Main Sidebar Header -->
+
+    <!-- Block -->
+    <div class="block">
+      <!-- Block Title -->
+      <div class="block-title">
+        <h2>
+          <strong>MENU {{ $root.judulHalaman }}</strong>
+        </h2>
+
+        <i v-if="!status_table" class="fa fa-spinner fa-spin text-default"></i>
+      </div>
+      <!-- END Block Title -->
+
+      <div class="block-content">
+        <!------------------------>
+        <!-- Button trigger modal -->
+
+        <!-- <pre>{{ csv }}</pre> -->
+
+        <div v-if="csv != null">
+          <strong>{{ csv.length }}</strong> data<br />
+        </div>
+
+        <vue-csv-import v-model="csv" :fields="dataImportCsv">
+          <vue-csv-toggle-headers></vue-csv-toggle-headers>
+          <vue-csv-errors></vue-csv-errors>
+          <vue-csv-input></vue-csv-input>
+          <vue-csv-table-map
+            :auto-match="true"
+            :table-attributes="{
+              id: 'csv=table',
+              class: 'table table-bordered table-hover',
+            }"
+          ></vue-csv-table-map>
+        </vue-csv-import>
+
+        <br />
+        <button
+          v-if="csv != null"
+          @click="saveTodoBulky()"
+          type="button"
+          class="btn btn-sm btn-primary pull-left"
+        >
+          SAVE DATA BULKY
+        </button>
+        <br />
+        <br />
+        <br />
+        <br />
+
+        <button
+          v-if="status_table && $root.accessRoles[access_page].create"
+          class="btn btn-sm btn-primary pull-right"
+          @click="show_modal()"
+        >
+          ADD DATA
+        </button>
+
+        <div>
+          <button
+            @click="downloadCSV"
+            :disabled="isLoading"
+            class="btn btn-primary btn-sm"
+          >
+            {{ isLoading ? "Downloading..." : "Download CSV" }}
+          </button>
+        </div>
+
+        <div class="row row-cols-2">
+          <div class="col-md-12">
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">yop</label>
+              </div>
+              <v-select
+                id="select-yop"
+                variant="outlined"
+                label="yop"
+                name="yop"
+                :options="dataYop"
+                placeholder="Select Yop"
+                :disabled="isFetching"
+                v-model="selectedYop"
+                @update:modelValue="onChangeYopHandler"
+              ></v-select>
+            </div>
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">mop</label>
+              </div>
+              <v-select
+                id="select-mop"
+                variant="outlined"
+                label="mop"
+                name="mop"
+                :options="dataMop"
+                placeholder="Select Mop"
+                :disabled="isFetching"
+                v-model="selectedMop"
+                @update:modelValue="onChangeMopHandler"
+              ></v-select>
+            </div>
+          </div>
+        </div>
+
+        <br />
+        <div class="row row-cols-2">
+          <div class="col-md-12">
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">itemCode</label>
+              </div>
+              <v-select
+                id="select-itemCode"
+                variant="outlined"
+                label="itemCode"
+                name="itemCode"
+                :options="dataItemCode"
+                placeholder="Select ItemCode"
+                :disabled="isFetching"
+                v-model="selectedItemCode"
+                @update:modelValue="onChangeItemCodeHandler"
+              ></v-select>
+            </div>
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">distCode</label>
+              </div>
+              <v-select
+                id="select-distCode"
+                variant="outlined"
+                label="distCode"
+                name="distCode"
+                :options="dataDistCode"
+                placeholder="Select DistCode"
+                :disabled="isFetching"
+                v-model="selectedDistCode"
+                @update:modelValue="onChangeDistCodeHandler"
+              ></v-select>
+            </div>
+          </div>
+          <br />
+        </div>
+        <br />
+        <div class="row row-cols-2">
+          <div class="col-md-12">
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">brchName</label>
+              </div>
+              <v-select
+                id="select-brchName"
+                variant="outlined"
+                label="brchName"
+                name="brchName"
+                :options="dataBrchName"
+                placeholder="Select BrchName"
+                :disabled="isFetching"
+                v-model="selectedBrchName"
+                @update:modelValue="onChangeBrchNameHandler"
+              ></v-select>
+            </div>
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">onHandUnit</label>
+              </div>
+              <v-select
+                id="select-onHandUnit"
+                variant="outlined"
+                label="onHandUnit"
+                name="onHandUnit"
+                :options="dataOnHandUnit"
+                placeholder="Select OnHandUnit"
+                :disabled="isFetching"
+                v-model="selectedOnHandUnit"
+                @update:modelValue="onChangeOnHandUnitHandler"
+              ></v-select>
+            </div>
+          </div>
+        </div>
+        <br /><br /><br />
+        <!-- <div>
+          <button @click="downloadCSV" class="btn btn-primary btn-sm">
+            Download CSV
+          </button>
+        </div> -->
+
+        <!------------------------>
+        <div id="wrapper2"></div>
+        <div id="box"></div>
+      </div>
+      <!-- Block Content -->
+      <!-- END Block Content -->
+    </div>
+    <!-- END Block -->
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+import { markRaw } from "vue";
+import { Grid, h, html } from "gridjs";
+import "gridjs/dist/theme/mermaid.css";
+import { idID } from "gridjs/l10n";
+
+import loadingBar from "@/assets/img/Moving_train.gif";
+
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
+export default {
+  components: {
+    // CmpSelect2,
+    // LoadingX,
+    // CmpInputText,
+    // CmpInputText,
+  },
+  data() {
+    return {
+      access_page: this.$root.decryptData(localStorage.getItem("halaman")),
+      isLogin: localStorage.getItem("token") != null ? 1 : 0,
+      activemenu: null,
+      grid: new Grid(),
+      // grid2: new Grid(),
+      errorField: {
+        yop: false,
+        distCode: false,
+        mop: false,
+        brchName: false,
+        itemCode: false,
+        onHandUnit: false,
+      },
+
+      userid: 0,
+      status_table: false,
+
+      modal: false,
+
+      todo: {
+        yop: "",
+        distCode: "",
+        mop: "",
+        brchName: "",
+        itemCode: "",
+        onHandUnit: "",
+      },
+
+      flagButtonAdd: true,
+      csv: null,
+
+      dataStd: [],
+      dataMop: [],
+      dataDistCode: [],
+      dataBrchName: [],
+      dataYop: [],
+      dataItemCode: [],
+      dataOnHandUnit: [],
+
+      selectedYop: {},
+      selectedMop: {},
+      selectedDistCode: {},
+      selectedItemCode: {},
+      selectedBrand: {},
+      selectedOnHandUnit: {},
+
+      dataImportCsv: {
+        yop: {
+          label: "yop",
+          required: true,
+        },
+        mop: {
+          label: "mop",
+          required: true,
+        },
+        distCode: {
+          label: "distCode",
+          required: true,
+        },
+        brchName: {
+          label: "brchName",
+          required: true,
+        },
+        itemCode: {
+          label: "itemCode",
+          required: true,
+        },
+        onHandUnit: {
+          label: "onHandUnit",
+          required: true,
+        },
+      },
+    };
+  },
+  async mounted() {
+    // await this.$root.refreshToken(localStorage.getItem("token"));
+    this.getTable();
+    this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
+    // await this.getDistributorForm();
+    // await this.getRegionForm();
+    // await this.getBranchForm();
+    // await this.getChannelForm();
+    // await this.getBrandForm();
+    // await this.getStatusProductForm();
+    await this.getAllDatas();
+  },
+  methods: {
+    async getAllDatas() {
+      this.isFetching = true;
+
+      const urlGetStd = this.$root.apiHost + this.$root.prefixApi + "stdAll";
+      const { data } = await axios.get(urlGetStd);
+      this.dataStd = [
+        {
+          itemCode: "All",
+          mop: "All",
+          yop: "All",
+          distCode: "All",
+          brchName: "All",
+          onHandUnit: "All",
+        },
+        ...data.results,
+      ];
+
+      const uniqueYops = [];
+      this.dataYop = this.dataStd.filter((item) => {
+        if (!uniqueYops.includes(item.yop)) {
+          uniqueYops.push(item.yop);
+          return true;
+        }
+        return false;
+      });
+
+      const uniqueMops = [];
+      this.dataMop = this.dataStd.filter((item) => {
+        if (!uniqueMops.includes(item.mop)) {
+          uniqueMops.push(item.mop);
+          return true;
+        }
+        return false;
+      });
+
+      const uniqueDistCodes = [];
+      this.dataDistCode = this.dataStd.filter((item) => {
+        if (!uniqueDistCodes.includes(item.distCode)) {
+          uniqueDistCodes.push(item.distCode);
+          return true;
+        }
+        return false;
+      });
+
+      const uniqueBrchNames = [];
+      this.dataBrchName = this.dataStd.filter((item) => {
+        if (!uniqueBrchNames.includes(item.brchName)) {
+          uniqueBrchNames.push(item.brchName);
+          return true;
+        }
+        return false;
+      });
+
+      const uniqueItemCodes = [];
+      this.dataItemCode = this.dataStd.filter((item) => {
+        if (!uniqueItemCodes.includes(item.itemCode)) {
+          uniqueItemCodes.push(item.itemCode);
+          return true;
+        }
+        return false;
+      });
+
+      const uniqueOnHandUnits = [];
+      this.dataOnHandUnit = this.dataStd.filter((item) => {
+        if (!uniqueOnHandUnits.includes(item.onHandUnit)) {
+          uniqueOnHandUnits.push(item.onHandUnit);
+          return true;
+        }
+        return false;
+      });
+
+      console.log(this.dataYop, "data yop");
+      console.log(this.dataMop, "data mop");
+      console.log(this.dataBrchName, "data brchName");
+      console.log(this.dataItemCode, "data itemCode");
+      console.log(this.dataDistCode, "data distCode");
+      console.log(this.dataOnHandUnit, "data onHandUnit");
+
+      this.selectedDistCode = this.dataStd[0];
+      this.selectedYop = this.dataStd[0];
+      this.selectedMop = this.dataStd[0];
+      this.selectedBrchName = this.dataStd[0];
+      this.selectedOnHandUnit = this.dataStd[0];
+      this.selectedItemCode = this.dataStd[0];
+
+      this.isFetching = false;
+      this.refreshTable();
+    },
+    searchData() {
+      axios
+        .get("stdAll", {
+          params: {
+            yop: this.todo.yop,
+            mop: this.todo.mop,
+            distCode: this.todo.distCode,
+            brchName: this.todo.brchName,
+            itemCode: this.todo.itemCode,
+            onHandUnit: this.todo.onHandUnit,
+          },
+        })
+        .then((response) => {
+          // handle success response
+          console.log(response.data);
+        })
+        .catch((error) => {
+          // handle error
+          console.log(error);
+        });
+    },
+    downloadCSV() {
+      const url = `${this.$root.apiHost}${this.$root.prefixApi}stdBulky`; // Ganti dengan URL endpoint Anda
+      axios({
+        url: url,
+        method: "GET",
+        responseType: "blob", // Agar bisa mendownload file
+      })
+        .then((response) => {
+          // Buat URL untuk blob data
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "export_data.csv"); // Nama file
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link); // Bersihkan elemen link setelah digunakan
+        })
+        .catch((error) => {
+          console.error("Error saat mendownload CSV", error);
+        });
+    },
+
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Handle file upload logic here
+        const formData = new FormData();
+        formData.append("file", file);
+        this.uploadFile(formData);
+      }
+    },
+    async uploadFile(formData) {
+      try {
+        await axios.post("/api/import", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("File uploaded successfully");
+      } catch (error) {
+        console.error("File upload failed:", error);
+        alert("File upload failed");
+      }
+    },
+
+    onChangeYopHandler(e) {
+      // this.todo.distributor = e.distributor;
+      this.todo.yop = this.selectedYop;
+      this.refreshTable();
+    },
+
+    onChangeDistCodeHandler(e) {
+      this.todo.distCode = this.selectedDistCode;
+      this.refreshTable();
+    },
+
+    onChangeMopHandler(e) {
+      this.todo.mop = this.selectedMop;
+      this.refreshTable();
+    },
+
+    onChangeBrchNameHandler(e) {
+      this.todo.brchName = this.selectedBrchName;
+      this.refreshTable();
+    },
+
+    onChangeItemCodeHandler(e) {
+      this.todo.itemCode = this.selectedItemCode;
+      this.refreshTable();
+    },
+
+    onChangeOnHandUnitHandler(e) {
+      this.todo.onHandUnit = this.selectedOnHandUnit;
+      this.refreshTable();
+    },
+
+    mySelectEvent() {
+      this.todo.roles = this.tmp.cboRoles.code;
+    },
+    resetForm() {
+      var mythis = this;
+      Object.keys(mythis.errorField).forEach(function (key) {
+        mythis.errorField[key] = false;
+        mythis.todo[key] = "";
+        //mythis.todo2[key] = "";
+      });
+    },
+    refreshTable() {
+      var mythis = this;
+      mythis.status_table = false;
+      //////////////////////////////
+      $("#wrapper2").remove();
+      var e = $('<div id="wrapper2"></div>');
+      $("#box").append(e);
+      this.getTable();
+      //////////////////////////////
+    },
+    saveTodo() {
+      var mythis = this;
+
+      Swal.fire({
+        title: "Create Master Item",
+        text: "Are you sure?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          /////////////////////////////////////////////////////////////////////
+          // mythis.$root.presentLoading();
+          mythis.$root.flagButtonLoading = true;
+          // const AuthStr = "bearer " + localStorage.getItem("token");
+          // const config = {
+          //   headers: {
+          //     Authorization: AuthStr,
+          //   },
+          // };
+          const config = "";
+          var url = mythis.$root.apiHost + mythis.$root.prefixApi + "std";
+          axios
+            .post(
+              url,
+              {
+                yop: mythis.todo.yop,
+                mop: mythis.todo.mop,
+                distCode: mythis.todo.distCode,
+                brchName: mythis.todo.brchName,
+                itemCode: mythis.todo.itemCode,
+                onHandUnit: mythis.todo.onHandUnit,
+                userid: mythis.userid,
+              },
+              config
+            )
+            .then((res) => {
+              Swal.fire("Created!", res.data.message, "success");
+              //mythis.$root.stopLoading();
+              mythis.$root.flagButtonLoading = false;
+              mythis.resetForm();
+              mythis.show_modal();
+              mythis.refreshTable();
+            })
+            .catch(function (error) {
+              mythis.$root.flagButtonLoading = false;
+              if (error.response) {
+                //console.log(error.response.data);
+                if (error.response.status == 422) {
+                  mythis.errorList = error.response.data;
+                  // mythis.$root.loader = false;
+                  if (Object.keys(mythis.errorList).length > 0) {
+                    //refresh semua menjadi false
+                    Object.keys(mythis.errorField).forEach(function (key) {
+                      mythis.errorField[key] = false;
+                    });
+                    //membuat jika error jadi true
+                    Object.keys(mythis.errorList).forEach(function (key) {
+                      toast.error(mythis.errorList[key], { theme: "colored" });
+
+                      // const myArray = key.split(".");
+                      // mythis.errorField[myArray[1]] = true;
+                      mythis.errorField[key] = true;
+                    });
+                  }
+                } else {
+                  toast.error(error.response.data.message, {
+                    theme: "colored",
+                  });
+                }
+              } else if (error.request) {
+                console.log(error.request);
+              } else {
+                console.log("Error", error.message);
+              }
+            });
+          /////////////////////////////////////////////////////////////////////
+        }
+      });
+    },
+    saveTodoBulky() {
+      var mythis = this;
+
+      Swal.fire({
+        title: "Create Master Item Bulky",
+        text: "Are you sure?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          /////////////////////////////////////////////////////////////////////
+          mythis.$root.presentLoading();
+          mythis.$root.flagButtonLoading = true;
+          // const AuthStr = "bearer " + localStorage.getItem("token");
+          // const config = {
+          //   headers: {
+          //     Authorization: AuthStr,
+          //   },
+          // };
+          const config = "";
+          var url = mythis.$root.apiHost + mythis.$root.prefixApi + "stdBulky";
+          axios
+            .post(
+              url,
+              {
+                csv: mythis.csv,
+                userid: mythis.userid,
+              },
+              config
+            )
+            .then((res) => {
+              Swal.fire("Created!", res.data.message, "success");
+              mythis.$root.stopLoading();
+              mythis.$root.flagButtonLoading = false;
+              mythis.resetForm();
+              // mythis.show_modal();
+              mythis.csv = null;
+              mythis.refreshTable();
+            })
+            .catch(function (error) {
+              mythis.$root.flagButtonLoading = false;
+              if (error.response) {
+                //console.log(error.response.data);
+                if (error.response.status == 422) {
+                  mythis.errorList = error.response.data;
+                  // mythis.$root.loader = false;
+                  if (Object.keys(mythis.errorList).length > 0) {
+                    //refresh semua menjadi false
+                    Object.keys(mythis.errorField).forEach(function (key) {
+                      mythis.errorField[key] = false;
+                    });
+                    //membuat jika error jadi true
+                    Object.keys(mythis.errorList).forEach(function (key) {
+                      toast.error(mythis.errorList[key], { theme: "colored" });
+
+                      // const myArray = key.split(".");
+                      // mythis.errorField[myArray[1]] = true;
+                      mythis.errorField[key] = true;
+                    });
+                  }
+                } else {
+                  toast.error(error.response.data.message, {
+                    theme: "colored",
+                  });
+                }
+              } else if (error.request) {
+                console.log(error.request);
+              } else {
+                console.log("Error", error.message);
+              }
+            });
+          /////////////////////////////////////////////////////////////////////
+        }
+      });
+    },
+    show_modal() {
+      this.modal = !this.modal;
+      if (this.modal == false) {
+        this.flagButtonAdd = true;
+        this.resetForm();
+      }
+    },
+    async jqueryDelEdit() {
+      const mythis = this;
+      $(document).on("click", "#editData", async function () {
+        let id = $(this).data("id");
+        await mythis.getData(id);
+        mythis.show_modal();
+      });
+      $(document).on("click", "#deleteData", function () {
+        let id = $(this).data("id");
+        mythis.deleteTodo(id);
+      });
+    },
+    getTable() {
+      var mythis = this;
+      this.grid = new Grid();
+      this.grid.updateConfig({
+        // language: idID,
+        pagination: {
+          limit: mythis.$root.pagingTabel1,
+          server: {
+            url: (prev, page, limit) =>
+              `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
+                page * limit
+              }${
+                this.selectedYop != undefined && 
+                this.selectedYop.yop != "All"
+                  ? "&yop=" + this.selectedYop.yop
+                  : ""
+              }${
+                this.selectedMop.mop != undefined &&
+                this.selectedMop.mop != "All"
+                  ? "&mop=" + this.selectedMop.mop
+                  : ""
+              }${
+                this.selectedDistCode.distCode != undefined &&
+                this.selectedDistCode.distCode != "All"
+                  ? "&distCode=" + this.selectedDistCode.distCode
+                  : ""
+              }${
+                this.selectedBrchName.brchName != undefined &&
+                this.selectedBrchName.brchName != "All"
+                  ? "&brchName=" + this.selectedBrchName.brchName
+                  : ""
+              }${
+                this.selectedItemCode.itemCode != undefined &&
+                this.selectedItemCode.itemCode != "All"
+                  ? "&itemCode=" + this.selectedItemCode.itemCode
+                  : ""
+              }${
+                this.selectedOnHandUnit.onHandUnit != undefined &&
+                this.selectedOnHandUnit.onHandUnit != "All"
+                  ? "&onHandUnit=" + this.selectedOnHandUnit.onHandUnit
+                  : ""
+              }`,
+          },
+        },
+        search: {
+          server: {
+            url: (prev, keyword) => `${prev}?search=${keyword}`,
+          },
+        },
+        columns: [
+          { name: "ID", hidden: true },
+          "No",
+          "yop",
+          "mop",
+          "distCode",
+          "brchName",
+          "itemCode",
+          "onHandUnit",
+
+          {
+            name: "Action",
+            formatter: (_, row) =>
+              mythis.$root.accessRoles[mythis.access_page].update &&
+              mythis.$root.accessRoles[mythis.access_page].delete
+                ? html(
+                    `
+                <button data-id="${row.cells[0].data}" class="btn btn-sm btn-warning text-white" id="editData" data-toggle="tooltip" title="Edit" ><i class="fa fa-pencil-square-o"></i></button>
+                &nbsp;&nbsp;&nbsp;
+                <button data-id="${row.cells[0].data}" class="btn btn-sm btn-danger text-white" id="deleteData" data-toggle="tooltip" title="Delete" ><i class="fa fa-trash-o"></i></button>
+              `
+                  )
+                : mythis.$root.accessRoles[mythis.access_page].update
+                ? html(
+                    `
+                <button data-id="${row.cells[0].data}" class="btn btn-sm btn-warning text-white" id="editData" data-toggle="tooltip" title="Edit" ><i class="fa fa-pencil-square-o"></i></button>`
+                  )
+                : mythis.$root.accessRoles[mythis.access_page].delete
+                ? html(`&nbsp;&nbsp;&nbsp;
+                <button data-id="${row.cells[0].data}" class="btn btn-sm btn-danger text-white" id="deleteData" data-toggle="tooltip" title="Delete" ><i class="fa fa-trash-o"></i></button>`)
+                : ``,
+          },
+        ],
+        style: {
+          table: {
+            border: "1px solid #ccc",
+          },
+          th: {
+            "background-color": "rgba(0, 55, 255, 0.1)",
+            color: "#000",
+            "border-bottom": "1px solid #ccc",
+            "text-align": "center",
+          },
+          td: {
+            "text-align": "center",
+          },
+        },
+        server: {
+          url: this.$root.apiHost + this.$root.prefixApi + "std",
+          then: (data) =>
+            data.results.map((card) => [
+              card.id,
+              data.nomorBaris++ + 1,
+              html(`<span class="pull-left">${card.yop}</span>`),
+              html(`<span class="pull-left">${card.mop}</span>`),
+              html(`<span class="pull-left">${card.distCode}</span>`),
+              html(`<span class="pull-left">${card.brchName}</span>`),
+              html(`<span class="pull-left">${card.itemCode}</span>`),
+              html(`<span class="pull-left">${card.onHandUnit}</span>`),
+            ]),
+          total: (data) => data.count,
+          handle: (res) => {
+            // no matching records found
+            if (res.status === 404) return { data: [] };
+            if (res.ok) return res.json();
+
+            throw Error("oh no :(");
+          },
+        },
+      });
+      // DOM instead of vue selector because we are using vanilla JS
+      this.grid.render(document.getElementById("wrapper2"));
+      this.number = 0;
+
+      $(document).off("click", "#editData");
+      $(document).off("click", "#deleteData");
+      mythis.jqueryDelEdit();
+      this.status_table = true;
+    },
+    deleteTodo(id) {
+      var mythis = this;
+      Swal.fire({
+        title: "Delete Data",
+        text: "Are you sure?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          mythis.$root.presentLoading();
+          const config = {
+            // const AuthStr = "bearer " + localStorage.getItem("token");
+            // const config = {
+            //   headers: {
+            //     Authorization: AuthStr,
+            //   },
+            data: {
+              fileUpload: "form satuan",
+              userid: mythis.userid,
+            },
+          };
+          axios
+            .delete(
+              mythis.$root.apiHost + mythis.$root.prefixApi + `std/${id}`,
+              config
+            )
+            .then((res) => {
+              //console.log(res.data.data);
+              // /Swal.fire("Terhapus!", "Data telah sukses dihapus", "success");
+              Swal.fire("Deleted!", "Data has been deleted", "success");
+
+              mythis.$root.stopLoading();
+              mythis.refreshTable();
+              mythis.resetForm();
+            });
+        }
+      });
+    },
+    editTodo() {
+      var mythis = this;
+      mythis.$root.flagButtonLoading = true;
+      // const AuthStr = "bearer " + localStorage.getItem("token");
+
+      //   headers: {
+      //     Authorization: AuthStr,
+      //   },
+      // };
+      const config = "";
+      axios
+        .put(
+          mythis.$root.apiHost +
+            mythis.$root.prefixApi +
+            "std/" +
+            mythis.todo.id,
+          {
+            yop: mythis.todo.yop,
+            mop: mythis.todo.mop,
+            distCode: mythis.todo.distCode,
+            brchName: mythis.todo.brchName,
+            itemCode: mythis.todo.itemCode,
+            onHandUnit: mythis.todo.onHandUnit,
+            userid: mythis.userid,
+          },
+          config
+        )
+        .then((res) => {
+          //console.log(res);
+          //alert(res.data.message);
+          Swal.fire("Updated!", res.data.message, "success");
+          mythis.$root.flagButtonLoading = false;
+          mythis.resetForm();
+          mythis.show_modal();
+          mythis.refreshTable();
+        })
+        .catch(function (error) {
+          mythis.$root.flagButtonLoading = false;
+          if (error.response) {
+            //console.log(error.response.data);
+            if (error.response.status == 422) {
+              mythis.errorList = error.response.data;
+              mythis.$root.loader = false;
+              if (Object.keys(mythis.errorList).length > 0) {
+                //refresh semua menjadi false
+                Object.keys(mythis.errorField).forEach(function (key) {
+                  mythis.errorField[key] = false;
+                });
+                //membuat jika error jadi true
+                Object.keys(mythis.errorList).forEach(function (key) {
+                  toast.error(mythis.errorList[key], { theme: "colored" });
+
+                  // const myArray = key.split(".");
+                  // mythis.errorField[myArray[1]] = true;
+                  mythis.errorField[key] = true;
+                });
+              }
+            } else {
+              toast.error(error.response.data.message, {
+                theme: "colored",
+              });
+            }
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log("Error", error.message);
+          }
+        });
+    },
+    async getData(id) {
+      var mythis = this;
+      mythis.flagButtonAdd = false;
+      mythis.$root.presentLoading();
+      mythis.todo = {};
+      // const AuthStr = "bearer " + localStorage.getItem("token");
+      const config = {
+        // headers: {
+        //   Authorization: AuthStr,
+        // },
+      };
+      await axios
+        .get(
+          mythis.$root.apiHost + mythis.$root.prefixApi + `std/${id}`,
+          config
+        )
+        .then(async (res) => {
+          // console.log(res.data.data);
+          //mythis.acuanEdit = id;
+          //mythis.todo = res.data.data;
+          mythis.todo.id = id;
+          mythis.todo.yop = res.data.data.yop;
+          mythis.todo.mop = res.data.data.mop;
+          mythis.todo.distCode = res.data.data.distCode;
+          mythis.todo.brchName = res.data.data.brchName;
+          mythis.todo.itemCode = res.data.data.itemCode;
+          mythis.todo.onHandUnit = res.data.data.onHandUnit;
+          document.getElementById("inputA").focus(); // sets the focus on the input
+
+          mythis.$root.stopLoading();
+        });
+    },
+  },
+};
+</script>

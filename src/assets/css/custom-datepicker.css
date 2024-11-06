@@ -1,0 +1,62 @@
+
+.dp__main {
+    /* padding: 0.4em 1em; */
+    /* overflow: hidden; */
+    font-size: 1em;
+    border: 1px solid #bcb4b1;
+    /* border: 1px solid var(--vt-color-step-900); */
+    outline: none;
+    height: 3em;
+    background: white;
+    font-size: 14px;
+    color: var(--vt-color-step-300);
+    vertical-align: middle;
+    line-height: 2em;
+    min-width: 240px;
+}
+.dp__main input {
+    border: none !important;
+    height: 2.4em;
+    border-radius: 5em;
+}
+.dp__main .dp__outer_menu_wrap .dp__menu {
+    margin-top: -36px !important;
+}
+.dp__instance_calendar > div > div > .dp__month_year_row > .dp__overlay {
+    height:100vh;
+    max-height: 280px;
+}
+
+.dp__month_year_wrap .dp__overlay {
+    height: 324px !important;
+    width: 258px !important;
+    left: -25px !important;
+}
+.dp__month_year_wrap .dp__overlay .dp__overlay_container {
+    height: 290px !important;
+}
+
+.dp__input_icons {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    top:50%;
+    
+}
+.dp__menu {
+    font-size: 15px;
+}
+
+.dp__action_button {
+    font-size: 15px;
+    padding:15px;
+    margin-inline-start:20px;
+}
+.dp__input {
+    font-size: 15px;
+    margin-left: 0px;
+}
+
+.dp__selection_preview{    
+    font-size: 15px;
+}
