@@ -295,7 +295,7 @@
           </div>
         </div>
 
-        <div class="button-container">
+        <!-- <div class="button-container">
           <download-excel
             class="button"
             :data="json_data"
@@ -314,13 +314,14 @@
             </button>
           </download-excel>
 
-          <!-- <button
+          <button
             class="btn btn-sm btn-primary pull-right"
             @click="exportPdf()"
           >
             <i class="fas fa-file-pdf"></i>Export PDF
-          </button> -->
-        </div>
+          </button>
+        </div> -->
+
         <div class="d-flex justify-content-end align-items-center pull-right">
           <div >
             <button

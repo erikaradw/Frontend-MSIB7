@@ -381,7 +381,7 @@
           </div>
         </div>
 
-        <div class="button-container">
+        <!-- <div class="button-container">
           <download-excel
             class="button"
             :data="json_data"
@@ -400,10 +400,11 @@
             </button>
           </download-excel>
 
-          <!-- <button class="btn btn-sm btn-primary pull-left" @click="exportPdf()">
+          <button class="btn btn-sm btn-primary pull-left" @click="exportPdf()">
             <i class="fas fa-file-pdf"></i>Export PDF
-          </button> -->
-        </div>
+          </button>
+        </div> -->
+
         <!-- Button trigger modal -->
         <div style="display: flex; justify-content: flex-end; gap: 10px">
           <button

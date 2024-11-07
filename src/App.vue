@@ -442,7 +442,6 @@ export default {
             cmpHalSalesUnit: "SALES",
             cmpHalStockDetail: "STOCK DETAIL",
             cmpHalPOCust: "PO CUSTOMER",
-            
           },
           TREND: {
             cmpTrend_g: "TREND",
