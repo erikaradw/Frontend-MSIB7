@@ -424,7 +424,12 @@ export default {
 
       menuHeader: {
         "NAMA MENU": {
-          // MASTER: {
+          MASTER: {
+            cmpMasterProduct: "PRODUCT",
+            cmpMasterKategori: "KATEGORI",
+            cmpMasterCabang: "CABANG",
+            cmpMasterArea: "AREA",
+            cmpMasterRegion: "REGION",
           //   cmpMasterBrand: "BRAND",
           //   cmpMasterM_Price: "PRICE",
           //   cmpMasterItemPriceHistory: "ITEM PRICE HISTORY",
@@ -432,16 +437,12 @@ export default {
           //   cmpMasterArea: "AREA",
           //   cmpMasterCustomer: "CUSTOMER",
           // cmpMasterOpsiCabang: "OPSI CABANG",
-          // },
+           },
           "UPLOAD DATA": {
             cmpHalSalesUnit: "SALES",
             cmpHalStockDetail: "STOCK DETAIL",
             cmpHalPOCust: "PO CUSTOMER",
-            cmpMasterProduct: "PRODUCT",
-            cmpMasterKategori: "KATEGORI",
-            cmpMasterCabang: "CABANG",
-            cmpMasterArea: "AREA",
-            cmpMasterRegion: "REGION",
+            
           },
           TREND: {
             cmpTrend_g: "TREND",
