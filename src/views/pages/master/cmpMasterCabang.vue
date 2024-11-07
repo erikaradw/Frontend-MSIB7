@@ -45,7 +45,7 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    :disabled="!flagButtonAdd"
+                  
                     @input="
                       (val) =>
                         (todo.kode_cabang = todo.kode_cabang.toUpperCase())
@@ -106,7 +106,7 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    :disabled="!flagButtonAdd"
+                   
                     @input="
                       (val) => (todo.dist_code = todo.dist_code.toUpperCase())
                     "
@@ -138,7 +138,7 @@
                     name="area_code"
                     :options="dataAreaCode"
                     placeholder="Select Area Code"
-                    :disabled="isFetching"
+                    
                     v-model="selectedAreaCode"
                     @update:modelValue="onChangeAreaCodeHandler"
                   ></v-select>
@@ -195,7 +195,7 @@
                     name="region_name"
                     :options="dataRegionName"
                     placeholder="Select Region Name"
-                    :disabled="isFetching"
+                   
                     v-model="selectedRegionName"
                     @update:modelValue="onChangeRegionNameHandler"
                   ></v-select>
