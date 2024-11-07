@@ -494,47 +494,9 @@
                 name="dist_code"
                 :options="dataDistCode"
                 placeholder="Select Dist Code"
-                :disabled="isFetching"
+                
                 v-model="selectedDistCode"
                 @update:modelValue="onChangeDistCodeHandler"
-              ></v-select>
-            </div>
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">REGION</label>
-              </div>
-              <v-select
-                id="select-region_name"
-                variant="outlined"
-                label="region_name"
-                name="region_name"
-                :options="dataRegionName"
-                placeholder="Select Region Code"
-                :disabled="isFetching"
-                v-model="selectedRegionName"
-                @update:modelValue="onChangeRegionNameHandler"
-              ></v-select>
-            </div>
-          </div>
-        </div>
-
-        <br />
-        <div class="row row-cols-2">
-          <div class="col-md-12">
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">BRANCH</label>
-              </div>
-              <v-select
-                id="select-nama_cabang"
-                variant="outlined"
-                label="nama_cabang"
-                name="nama_cabang"
-                :options="dataBranch"
-                placeholder="Select Branch"
-                :disabled="isFetching"
-                v-model="selectedBranch"
-                @update:modelValue="onChangeBranchHandler"
               ></v-select>
             </div>
             <div class="col-md-6">
@@ -548,11 +510,51 @@
                 name="chnl_code"
                 :options="dataChannel"
                 placeholder="Select Channel"
-                :disabled="isFetching"
+                
                 v-model="selectedChannel"
                 @update:modelValue="onChangeChannelHandler"
               ></v-select>
             </div>
+           
+          </div>
+        </div>
+
+        <br />
+        <div class="row row-cols-2">
+          <div class="col-md-12">
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">REGION</label>
+              </div>
+              <v-select
+                id="select-region_name"
+                variant="outlined"
+                label="region_name"
+                name="region_name"
+                :options="dataRegionName"
+                placeholder="Select Region Code"
+                
+                v-model="selectedRegionName"
+                @update:modelValue="onChangeRegionNameHandler"
+              ></v-select>
+            </div>
+            <div class="col-md-6">
+              <div>
+                <label for="select-item">BRANCH</label>
+              </div>
+              <v-select
+                id="select-nama_cabang"
+                variant="outlined"
+                label="nama_cabang"
+                name="nama_cabang"
+                :options="dataBranch"
+                placeholder="Select Branch"
+                
+                v-model="selectedBranch"
+                @update:modelValue="onChangeBranchHandler"
+              ></v-select>
+            </div>
+            
           </div>
           <br />
         </div>
@@ -570,7 +572,7 @@
                 name="brand_name"
                 :options="dataBrand"
                 placeholder="Select Brand"
-                :disabled="isFetching"
+               
                 v-model="selectedBrand"
                 @update:modelValue="onChangeBrandHandler"
               ></v-select>
@@ -587,7 +589,7 @@
                 name="status_product"
                 :options="dataStatusProduct"
                 placeholder="Select Status Product"
-                :disabled="isFetching"
+               
                 v-model="selectedStatusProduct"
                 @update:modelValue="onChangeStatusProductHandler"
               ></v-select>
@@ -607,7 +609,7 @@
                     name="tahun"
                     :options="dataYearPeriode"
                     placeholder="Select Year Periode"
-                    :disabled="isFetching"
+                    
                     v-model="selectedYearPeriode"
                     @update:modelValue="onChangeYearPeriodeHandler"
                   ></v-select>
@@ -1266,7 +1268,7 @@ export default {
       }
     },
     async getAllDatas() {
-      this.isFetching = true;
+      this.isFetching = false;
 
       const urlGetTrend = this.$root.apiHost + this.$root.prefixApi + "M_CabangAll";
       const { data } = await axios.get(urlGetTrend);
