@@ -486,6 +486,7 @@ export default {
               // Reset variabel frontend
               this.fileUpload = null;
               this.csv = null;
+              this.refreshTable();
             })
             .catch((error) => {
               console.error("Error deleting file:", error);

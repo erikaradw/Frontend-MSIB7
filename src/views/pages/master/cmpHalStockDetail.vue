@@ -391,6 +391,14 @@
             >
               <i class="fa fa-trash"></i> Delete All Data
             </button>
+
+            <button
+            v-if="isUploaded"
+            class="btn btn-sm btn-danger pull-right"
+            @click="deleteLastUploadedFile"
+          >
+            <i class="fa fa-trash"></i> Delete Last Uploaded File
+          </button>
           </div>
         </div>
 
@@ -440,6 +448,7 @@ export default {
   },
   data() {
     return {
+      isUploaded: false,
       access_page: this.$root.decryptData(localStorage.getItem("halaman")),
       isLogin: localStorage.getItem("token") != null ? 1 : 0,
       activemenu: null,
@@ -589,9 +598,13 @@ export default {
         });
     },
     logsCSV() {
-      const csvInput = this.$refs.inputCSV.csvRef.files[0].name;
-      this.fileUpload = csvInput;
-      console.log(csvInput);
+      const csvInput = this.$refs.inputCSV.csvRef.files[0];
+      if (csvInput) {
+        this.fileUpload = csvInput.name;
+        console.log("File uploaded:", this.fileUpload);
+      } else {
+        console.log("No file uploaded.");
+      }
     },
     show_modalBulk() {
       console.log("ww");
@@ -599,6 +612,7 @@ export default {
       if (!this.modalBulk) {
         // this.flag_checkBulk = false;  // Reset flag saat modal ditutup
         this.csv = null; // Reset CSV saat modal ditutup
+        this.fileUpload = null;
         this.csvValid = [];
         this.csvReject = [];
       }
@@ -769,6 +783,46 @@ export default {
         }
       });
     },
+    deleteLastUploadedFile() {
+      Swal.fire({
+        title: "Delete Uploaded File",
+        text: "Are you sure you want to delete the last uploaded file?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Tampilkan indikator loading
+          this.$root.presentLoading();
+          // axios.delete("http://localhost:8002/M_Region")
+          // Request ke backend untuk menghapus file
+          axios
+            .delete("http://localhost:8002/si/stockdetail")
+            .then(() => {
+              Swal.fire(
+                "Deleted!",
+                "The last uploaded file has been deleted.",
+                "success"
+              );
+              this.isUploaded=false;
+              // Reset variabel frontend
+              this.fileUpload = null;
+              this.csv = null;
+              this.refreshTable();
+            })
+            .catch((error) => {
+              console.error("Error deleting file:", error);
+              Swal.fire("Error", "Failed to delete file from server.", "error");
+            })
+            .finally(() => {
+              this.$root.stopLoading();
+            });
+        }
+      });
+    },
     saveTodoBulky() {
       var mythis = this;
 
@@ -783,6 +837,7 @@ export default {
         cancelButtonText: "Cancel",
       }).then((result) => {
         if (result.isConfirmed) {
+          this.isUploaded = true;
           /////////////////////////////////////////////////////////////////////
           mythis.$root.presentLoading();
           mythis.$root.flagButtonLoading = true;
@@ -1231,7 +1286,7 @@ export default {
             .delete(
               mythis.$root.apiHost +
                 mythis.$root.prefixApi +
-                `stockdetail/${id}`,
+                `stockdetail?id=${id}`,
               config
             )
             .then((res) => {
