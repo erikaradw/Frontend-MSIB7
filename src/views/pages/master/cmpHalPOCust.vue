@@ -45,7 +45,7 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    :disabled="!flagButtonAdd"
+                    
                     @input="
                       (val) => (todo.dist_code = todo.dist_code.toUpperCase())
                     "
@@ -65,7 +65,7 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    :disabled="!flagButtonAdd"
+                    
                     @input="
                       (val) => (todo.tgl_order = todo.tgl_order.toUpperCase())
                     "
@@ -130,6 +130,24 @@
                     />
                   </div>
                 </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="example-nf-email">qty_po</label>
+                    <input
+                      type="text"
+                      placeholder="Input qty_po"
+                      v-model="todo.qty_po"
+                      :class="
+                        errorField.qty_po
+                          ? 'form-control input-lg input-error'
+                          : 'form-control input-lg'
+                      "
+                      @input="
+                        (val) => (todo.qty_po = todo.qty_po.toUpperCase())
+                      "
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -155,6 +173,8 @@
                   todo.mtg_code == '' ||
                   todo.qty_sc_reg == null ||
                   todo.qty_sc_reg == '' ||
+                  todo.qty_po == null ||
+                  todo.qty_po == '' ||
                   todo.branch_code == null ||
                   todo.branch_code == ''
                 "
@@ -181,6 +201,8 @@
                   todo.mtg_code == '' ||
                   todo.qty_sc_reg == null ||
                   todo.qty_sc_reg == '' ||
+                  todo.qty_po == null ||
+                  todo.qty_po == '' ||
                   todo.branch_code == null ||
                   todo.branch_code == ''
                 "
@@ -410,6 +432,7 @@ export default {
         tgl_order: false,
         mtg_code: false,
         qty_sc_reg: false,
+        qty_po: false,
         branch_code: false,
       },
 
@@ -423,6 +446,7 @@ export default {
         tgl_order: "",
         dist_code: "",
         qty_sc_reg: "",
+        qty_po: "",
         mtg_code: "",
         branch_code: "",
       },
@@ -448,6 +472,10 @@ export default {
           label: "qty_sc_reg",
           required: true,
         },
+        qty_po: {
+          label: "qty_po",
+          required: true,
+        },
         branch_code: {
           label: "branch_code",
           required: true,
@@ -471,6 +499,7 @@ export default {
         TglOrder: "TglOrder",
         MTGCode: "MTGCode",
         QtyScReg: "QtyScReg",
+        QtyPo: "QtyPo",
         BranchCode: "BranchCode",
       },
     };
@@ -668,6 +697,7 @@ export default {
                 dist_code: mythis.todo.dist_code,
                 tgl_order: mythis.todo.tgl_order,
                 qty_sc_reg: mythis.todo.qty_sc_reg,
+                qty_po: mythis.todo.qty_po,
                 mtg_code: mythis.todo.mtg_code,
                 branch_code: mythis.todo.branch_code,
 
@@ -906,6 +936,7 @@ export default {
             TglOrder: resData.results[key].tgl_order,
             MTGCode: resData.results[key].mtg_code,
             QtyScReg: resData.results[key].qty_sc_reg,
+            QtyPo: resData.results[key].qty_po,
             BranchCode: resData.results[key].branch_code,
           };
           mythis.data_x_excel[baris_excel] = countries_x;
@@ -1017,6 +1048,7 @@ export default {
             item.tgl_order,
             item.mtg_code,
             item.qty_sc_reg,
+            item.qty_po,
             item.branch_code,
           ]),
           startY: 40, // Adjusted to accommodate the new information
@@ -1100,6 +1132,7 @@ export default {
           "Tgl Order",
           "MTG Code",
           "Qty SC Reg",
+          "Qty PO",
           "Cust Code",
 
           {
@@ -1151,6 +1184,7 @@ export default {
               html(`<span class="pull-left">${card.tgl_order}</span>`),
               html(`<span class="pull-left">${card.mtg_code}</span>`),
               html(`<span class="pull-left">${card.qty_sc_reg}</span>`),
+              html(`<span class="pull-left">${card.qty_po}</span>`),
               html(`<span class="pull-left">${card.branch_code}</span>`),
             ]),
           total: (data) => data.count,
@@ -1234,6 +1268,7 @@ export default {
             dist_code: mythis.todo.dist_code,
             tgl_order: mythis.todo.tgl_order,
             qty_sc_reg: mythis.todo.qty_sc_reg,
+            qty_po: mythis.todo.qty_po,
             mtg_code: mythis.todo.mtg_code,
             branch_code: mythis.todo.branch_code,
 
@@ -1308,6 +1343,7 @@ export default {
           mythis.todo.tgl_order = res.data.data.tgl_order;
           mythis.todo.mtg_code = res.data.data.mtg_code;
           mythis.todo.qty_sc_reg = res.data.data.qty_sc_reg;
+          mythis.todo.qty_po = res.data.data.qty_po;
           mythis.todo.branch_code = res.data.data.branch_code;
 
           document.getElementById("inputA").focus(); // sets the focus on the input

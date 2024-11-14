@@ -1,5 +1,10 @@
 <template>
   <!---------------------------- Modal -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+
   <div
     :class="modal ? 'modal fade in' : 'modal fade'"
     id="exampleModalCenter"
@@ -34,7 +39,7 @@
             <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">tahun</label>
+                  <label for="example-nf-email">Tahun</label>
                   <CmpInputText
                     id="inputA"
                     type="text"
@@ -45,14 +50,13 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    
                     @input="(val) => (todo.tahun = todo.tahun.toUpperCase())"
                   />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">bulan</label>
+                  <label for="example-nf-email">Bulan</label>
                   <CmpInputText
                     id="inputA"
                     type="text"
@@ -63,14 +67,13 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    
                     @input="(val) => (todo.bulan = todo.bulan.toUpperCase())"
                   />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">dist_code</label>
+                  <label for="example-nf-email">distCode</label>
                   <CmpInputText
                     type="text"
                     placeholder="Input dist_code"
@@ -86,13 +89,9 @@
                   />
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">chnl_code</label>
+                  <label for="example-nf-email">chnlCode</label>
                   <input
                     type="text"
                     placeholder="Input chnl_code"
@@ -110,12 +109,12 @@
               </div>
             </div>
           </div>
-
+         
           <div class="row">
             <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">brch_name</label>
+                  <label for="example-nf-email">brchName</label>
                   <input
                     type="text"
                     placeholder="Input brch_name"
@@ -131,14 +130,9 @@
                   />
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">item_code</label>
+                  <label for="example-nf-email">itemCode</label>
                   <input
                     type="text"
                     placeholder="Input item_code"
@@ -161,7 +155,7 @@
             <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">net_sales_unit</label>
+                  <label for="example-nf-email">NetSalesUnit</label>
                   <input
                     type="text"
                     placeholder="Input net_sales_unit"
@@ -329,6 +323,7 @@
           SAVE DATA SALES UNIT
         </button> -->
 
+        <!-- <button @click="deselectAll" class="btn btn-secondary">Deselect All</button> -->
         <div
           v-if="modalBulk"
           :class="modalBulk ? 'modal fade in' : 'modal fade'"
@@ -453,7 +448,7 @@
             <i class="fas fa-file-pdf"></i>Export PDF
           </button>
         </div> -->
-        
+
         <div class="d-flex justify-content-end align-items-center pull-right">
           <div>
             <button
@@ -476,13 +471,26 @@
             </button>
 
             <button
-            v-if="isUploaded"
-            class="btn btn-sm btn-danger pull-right"
-            @click="deleteLastUploadedFile"
-          >
-            <i class="fa fa-trash"></i> Delete Last Uploaded File
-          </button>
+              v-if="isUploaded"
+              class="btn btn-sm btn-danger pull-right"
+              @click="deleteLastUploadedFile"
+            >
+              <i class="fa fa-trash"></i> Delete Last Uploaded File
+            </button>
           </div>
+          <!-- <div>
+            <ul>
+              <li v-for="file in uploadedFiles" :key="file.id">
+                <input
+                  type="checkbox"
+                  v-model="selectedFiles"
+                  :value="file.id"
+                />
+                {{ file.name }}
+              </li>
+            </ul>
+            <button @click="deleteSelectedFiles">Delete Selected</button>
+          </div> -->
         </div>
         <!-- Button trigger modal -->
         <!-- <button
@@ -530,6 +538,9 @@ export default {
   },
   data() {
     return {
+      uploadedFiles: [], // Array untuk menyimpan daftar file yang di-upload
+      selectedFiles: [], // Array untuk menyimpan ID file yang dipilih
+
       isUploaded: false,
       access_page: this.$root.decryptData(localStorage.getItem("halaman")),
       isLogin: localStorage.getItem("token") != null ? 1 : 0,
@@ -569,7 +580,7 @@ export default {
       flagButtonAdd: true,
       csv: null,
       fileUpload: null,
-      
+
       dataImportCsv: {
         tahun: {
           label: "tahun",
@@ -635,11 +646,44 @@ export default {
     };
   },
   async mounted() {
+    this.bindChecklistEvents();
+    this.fetchUploadedFiles();
     // await this.$root.refreshToken(localStorage.getItem("token"));
     this.getTable();
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
   },
   methods: {
+    toggleCheck(event) {
+      const icon = event.target;
+      if (icon.classList.contains("fa-square-o")) {
+        icon.classList.remove("fa-square-o");
+        icon.classList.add("fa-check-square-o");
+      } else {
+        icon.classList.remove("fa-check-square-o");
+        icon.classList.add("fa-square-o");
+      }
+    },
+
+    // Bind the click event after the table is rendered
+    bindChecklistEvents() {
+      document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("checklist-icon")) {
+          this.toggleCheck(event); // Call the toggle function on click
+        }
+      });
+    },
+    async fetchUploadedFiles() {
+      // Ambil daftar file yang sudah di-upload dari backend
+      const response = await axios.get("/api/uploaded-files");
+      this.uploadedFiles = response.data;
+    },
+    async deleteSelectedFiles() {
+      for (let fileId of this.selectedFiles) {
+        await axios.delete(`/api/delete-uploaded-file/${fileId}`);
+      }
+      this.fetchUploadedFiles(); // Refresh daftar file setelah penghapusan
+      this.selectedFiles = []; // Reset pilihan
+    },
     //IMPORT CSV
     // checkTodoBulk() {
     //   console.log(this.csv);
@@ -935,7 +979,7 @@ export default {
                 "The last uploaded file has been deleted.",
                 "success"
               );
-              this.isUploaded=false;
+              this.isUploaded = false;
               // Reset variabel frontend
               this.fileUpload = null;
               this.csv = null;
@@ -1307,8 +1351,17 @@ export default {
           },
         },
         columns: [
-          { name: "ID", hidden: true },
-          "No",
+          {
+            name: "",
+            formatter: () =>
+              html(
+                `<i class="fa fa-square-o checklist-icon" style="cursor: pointer;" @click="toggleCheck"></i>`
+              ),
+            width: "50px",
+          },
+          { name: "No", hidden: false },
+
+          // "No",
           "Tahun",
           "Bulan",
           "distCode",
@@ -1420,7 +1473,9 @@ export default {
           };
           axios
             .delete(
-              mythis.$root.apiHost + mythis.$root.prefixApi + `salesunit?id=${id}`,
+              mythis.$root.apiHost +
+                mythis.$root.prefixApi +
+                `salesunit?id=${id}`,
               config
             )
             .then((res) => {
@@ -1549,6 +1604,9 @@ export default {
 </script>
 
 <style scoped>
+.checklist-icon {
+  cursor: pointer;
+}
 .custom-file-upload {
   display: inline-block;
   padding: 6px 12px;

@@ -21,7 +21,7 @@
             class="close"
             data-dismiss="modal"
             aria-label="Close"
-            :disabled="$root.flagButtonLoading"
+            
             @click="show_modal()"
           >
             <span aria-hidden="true">X</span>
@@ -34,7 +34,7 @@
             <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">tahun</label>
+                  <label for="example-nf-email">Tahun</label>
                   <CmpInputText
                     id="inputA"
                     type="text"
@@ -45,14 +45,14 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    :disabled="!flagButtonAdd"
+                    
                     @input="(val) => (todo.tahun = todo.tahun.toUpperCase())"
                   />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">bulan</label>
+                  <label for="example-nf-email">Bulan</label>
                   <CmpInputText
                     id="inputA"
                     type="text"
@@ -63,14 +63,14 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    :disabled="!flagButtonAdd"
+                    
                     @input="(val) => (todo.bulan = todo.bulan.toUpperCase())"
                   />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="example-nf-email">dist_code</label>
+                  <label for="example-nf-email">distCode</label>
                   <CmpInputText
                     type="text"
                     placeholder="Input dist_code"
@@ -86,11 +86,6 @@
                   />
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="example-nf-email">brch_name</label>
@@ -132,11 +127,6 @@
                   />
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="example-nf-email">on_hand_unit</label>

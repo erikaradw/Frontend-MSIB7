@@ -1,5 +1,9 @@
 <template>
   <!---------------------------- Modal -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
   <div
     :class="modal ? 'modal fade in' : 'modal fade'"
     id="exampleModalCenter"
@@ -30,273 +34,6 @@
         <div class="modal-body">
           <!-- <pre>{{ todo }}</pre> -->
           <!-- Wizards Row -->
-          <div class="row">
-            <div class="col-md-12">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Distributor</label>
-                  <CmpInputText
-                    id="inputA"
-                    type="text"
-                    placeholder="Input dist_code"
-                    v-model="todo.dist_code"
-                    :class="
-                      errorField.dist_code
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    :disabled="!flagButtonAdd"
-                    @input="
-                      (val) => (todo.dist_code = todo.dist_code.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Channel</label>
-                  <CmpInputText
-                    type="text"
-                    placeholder="Input Channel"
-                    v-model="todo.chnl_code"
-                    :class="
-                      errorField.chnl_code
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) => (todo.chnl_code = todo.chnl_code.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Region Name</label>
-                  <input
-                    type="text"
-                    v-model="todo.region_name"
-                    :class="
-                      errorField.region_name
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) =>
-                        (todo.region_name = todo.region_name.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Area Name</label>
-                  <input
-                    type="text"
-                    v-model="todo.area_name"
-                    :class="
-                      errorField.area_name
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) => (todo.area_name = todo.area_name.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Cabang</label>
-                  <input
-                    type="text"
-                    v-model="todo.nama_cabang"
-                    :class="
-                      errorField.nama_cabang
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) =>
-                        (todo.nama_cabang = todo.nama_cabang.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-              <!-- Add flag_active Checkbox -->
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Parent Code</label>
-                  <input
-                    type="text"
-                    v-model="todo.item_code"
-                    :class="
-                      errorField.item_code
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) => (todo.item_code = todo.item_code.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
-              <!-- Add fields for code_bars, mnft_code, uom1, uom2, uom3, uom4, and obj_type -->
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">SKU</label>
-                  <CmpInputText
-                    type="text"
-                    placeholder="Input SKU"
-                    v-model="todo.item_name"
-                    :class="
-                      errorField.item_name
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) => (todo.item_name = todo.item_name.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Brand</label>
-                  <CmpInputText
-                    type="text"
-                    placeholder="Input Brand"
-                    v-model="todo.brand_name"
-                    :class="
-                      errorField.brand_name
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) => (todo.brand_name = todo.brand_name.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Kategori</label>
-                  <CmpInputText
-                    type="text"
-                    placeholder="Input Kategori"
-                    v-model="todo.kategori"
-                    :class="
-                      errorField.kategori
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) => (todo.kategori = todo.kategori.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Status Product</label>
-                  <CmpInputText
-                    type="text"
-                    placeholder="Input Status Product"
-                    v-model="todo.status_product"
-                    :class="
-                      errorField.status_product
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                    @input="
-                      (val) =>
-                        (todo.status_product =
-                          todo.status_product.toUpperCase())
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- <div class="row">
-            <div class="col-md-12">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Unit of Measure 3</label>
-                  <CmpInputText
-                    type="number"
-                    placeholder="Input Unit of Measure 3"
-                    v-model="todo.uom3"
-                    :class="
-                      errorField.uom3
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                  />
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Unit of Measure 4</label>
-                  <CmpInputText
-                    type="number"
-                    placeholder="Input Unit of Measure 4"
-                    v-model="todo.uom4"
-                    :class="
-                      errorField.uom4
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-12">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="example-nf-email">Object Type</label>
-                  <CmpInputText
-                    type="number"
-                    placeholder="Input Object Type"
-                    v-model="todo.obj_type"
-                    :class="
-                      errorField.obj_type
-                        ? 'form-control input-lg input-error'
-                        : 'form-control input-lg'
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- END Wizards Row -->
         </div>
 
@@ -401,9 +138,7 @@
       <div class="block-content">
         <!------------------------>
         <!-- Button trigger modal -->
-
         <!-- <pre>{{ csv }}</pre> -->
-
         <div v-if="csv != null">
           <strong>{{ csv.length }}</strong> data<br />
         </div>
@@ -430,10 +165,7 @@
         >
           SAVE DATA
         </button>
-        <!-- <br />
-        <br />
-        <br />
-        <br /> -->
+
         <div class="button-container">
           <download-excel
             v-if="status_table"
@@ -471,16 +203,6 @@
           ADD DATA
         </button> -->
 
-        <!-- <div>
-          <button
-            @click="downloadCSV"
-            :disabled="isLoading"
-            class="btn btn-primary btn-sm"
-          >
-            {{ isLoading ? "Downloading..." : "Download CSV" }}
-          </button>
-        </div> -->
-
         <div class="row row-cols-2">
           <div class="col-md-12">
             <div class="col-md-6">
@@ -494,7 +216,6 @@
                 name="dist_code"
                 :options="dataDistCode"
                 placeholder="Select Dist Code"
-                
                 v-model="selectedDistCode"
                 @update:modelValue="onChangeDistCodeHandler"
               ></v-select>
@@ -510,12 +231,10 @@
                 name="chnl_code"
                 :options="dataChannel"
                 placeholder="Select Channel"
-                
                 v-model="selectedChannel"
                 @update:modelValue="onChangeChannelHandler"
               ></v-select>
             </div>
-           
           </div>
         </div>
 
@@ -533,7 +252,6 @@
                 name="region_name"
                 :options="dataRegionName"
                 placeholder="Select Region Code"
-                
                 v-model="selectedRegionName"
                 @update:modelValue="onChangeRegionNameHandler"
               ></v-select>
@@ -549,12 +267,10 @@
                 name="nama_cabang"
                 :options="dataBranch"
                 placeholder="Select Branch"
-                
                 v-model="selectedBranch"
                 @update:modelValue="onChangeBranchHandler"
               ></v-select>
             </div>
-            
           </div>
           <br />
         </div>
@@ -572,7 +288,6 @@
                 name="brand_name"
                 :options="dataBrand"
                 placeholder="Select Brand"
-               
                 v-model="selectedBrand"
                 @update:modelValue="onChangeBrandHandler"
               ></v-select>
@@ -589,7 +304,6 @@
                 name="status_product"
                 :options="dataStatusProduct"
                 placeholder="Select Status Product"
-               
                 v-model="selectedStatusProduct"
                 @update:modelValue="onChangeStatusProductHandler"
               ></v-select>
@@ -609,10 +323,30 @@
                     name="tahun"
                     :options="dataYearPeriode"
                     placeholder="Select Year Periode"
-                    
                     v-model="selectedYearPeriode"
                     @update:modelValue="onChangeYearPeriodeHandler"
                   ></v-select>
+                </div>
+                <div class="col-md-6">
+                  <div class="month-container">
+                    <label for="bulan" class="select-item">MONTH PERIODE</label>
+                    <div class="month-dropdown-wrapper">
+                      <select
+                        v-model="selectedMonth"
+                        id="bulan"
+                        class="month-dropdown"
+                      >
+                        <option
+                          v-for="bulan in bulanOptions"
+                          :key="bulan.value"
+                          :value="bulan.value"
+                        >
+                          {{ bulan.name }}
+                        </option>
+                      </select>
+                      <i class="fas fa-chevron-down month-dropdown-icon"></i>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -683,6 +417,23 @@ export default {
   },
   data() {
     return {
+      bulanOptions: [
+        { value: 1, name: "Januari" },
+        { value: 2, name: "Februari" },
+        { value: 3, name: "Maret" },
+        { value: 4, name: "April" },
+        { value: 5, name: "Mei" },
+        { value: 6, name: "Juni" },
+        { value: 7, name: "Juli" },
+        { value: 8, name: "Agustus" },
+        { value: 9, name: "September" },
+        { value: 10, name: "Oktober" },
+        { value: 11, name: "November" },
+        { value: 12, name: "Desember" },
+      ],
+      selectedMonth: "1", // Default bulan yang dipilih
+      orderedMonths: [],
+
       access_page: this.$root.decryptData(localStorage.getItem("halaman")),
       isLogin: localStorage.getItem("token") != null ? 1 : 0,
       activemenu: null,
@@ -700,57 +451,37 @@ export default {
         brand_name: false,
         kategori: false,
         status_product: false,
-        januari: false,
-        februari: false,
-        maret: false,
-        april: false,
-        mei: false,
-        juni: false,
-        juli: false,
-        agustus: false,
-        september: false,
-        oktober: false,
-        november: false,
-        desember: false,
-        unit12: false,
-        value12: false,
-        unit9: false,
-        value9: false,
-        unit6: false,
-        value6: false,
-        unit3: false,
-        value3: false,
-        beli_januari: false,
-        januari1: false,
-        beli_februari: false,
-        februari1: false,
-        beli_maret: false,
-        maret1: false,
-        beli_april: false,
-        april1: false,
-        beli_mei: false,
-        mei1: false,
-        beli_juni: false,
-        juni1: false,
-        beli_juli: false,
-        juli1: false,
-        beli_agustus: false,
-        agustus1: false,
-        beli_september: false,
-        september1: false,
-        beli_oktober: false,
-        oktober1: false,
-        beli_november: false,
-        november1: false,
-        beli_desember: false,
-        desember1: false,
-        doi3bulan: false,
-        status_trend: false,
-        delta: false,
-        pic: false,
+        month_1: false,
+        month_2: false,
+        month_3: false,
+        month_4: false,
+        month_5: false,
+        month_6: false,
+        month_7: false,
+        month_8: false,
+        month_9: false,
+        month_10: false,
+        month_11: false,
+        month_12: false,
+        yearly_average_unit: false,
+        yearly_average_value: false,
+        average_9_month_unit: false,
+        average_9_month_value: false,
+        average_6_month_unit: false,
+        average_6_month_value: false,
+        average_3_month_unit: false,
+        average_3_month_value: false,
         average_sales: false,
         purchase_suggestion: false,
         purchase_value: false,
+        stock_on_hand_unit: false,
+        doi_3_month: false,
+        status_trend: false,
+        delta: false,
+        qty_po: false,
+        qty_sc_reg: false,
+        service_level: false,
+        pic: false,
       },
 
       userid: 0,
@@ -770,57 +501,43 @@ export default {
         brand_name: "",
         kategori: "",
         status_product: "",
-        januari: "",
-        februari: "",
-        maret: "",
-        april: "",
-        mei: "",
-        juni: "",
-        juli: "",
-        agustus: "",
-        september: "",
-        oktober: "",
-        november: "",
-        desember: "",
-        unit12: "",
-        value12: "",
-        unit9: "",
-        value9: "",
-        unit6: "",
-        value6: "",
-        unit3: "",
-        value3: "",
-        beli_januari: "",
-        januari1: "",
-        beli_februari: "",
-        februari1: "",
-        beli_maret: "",
-        maret1: "",
-        beli_april: "",
-        april1: "",
-        beli_mei: "",
-        mei1: "",
-        beli_juni: "",
-        juni1: "",
-        beli_juli: "",
-        juli1: "",
-        beli_agustus: "",
-        agustus1: "",
-        beli_september: "",
-        september1: "",
-        beli_oktober: "",
-        oktober1: "",
-        beli_november: "",
-        november1: "",
-        beli_desember: "",
-        desember1: "",
-        doi3bulan: "",
-        status_trend: "",
-        delta: "",
-        pic: "",
+        month_1: "",
+        month_2: "",
+        month_3: "",
+        month_4: "",
+        month_5: "",
+        month_6: "",
+        month_7: "",
+        month_8: "",
+        month_9: "",
+        month_10: "",
+        month_11: "",
+        month_12: "",
+        yearly_average_unit: "",
+        yearly_average_value: "",
+        average_9_month_unit: "",
+        average_9_month_value: "",
+        average_6_month_unit: "",
+        average_6_month_value: "",
+        average_3_month_unit: "",
+        average_3_month_value: "",
         average_sales: "",
         purchase_suggestion: "",
         purchase_value: "",
+        stock_on_hand_unit: "",
+        doi_3_month: "",
+        status_trend: "",
+        delta: "",
+        qty_po: "",
+        qty_sc_reg: "",
+        service_level: "",
+        pic: "",
+      },
+
+      watch: {
+        selectedMonth() {
+          this.updateOrderedMonths();
+        },
       },
 
       flagButtonAdd: true,
@@ -834,6 +551,7 @@ export default {
       dataChannel: [],
       dataStatusProduct: [],
       dataYearPeriode: [],
+      dataMonthPeriode: [],
 
       selectedDistCode: {},
       selectedRegionName: {},
@@ -842,6 +560,7 @@ export default {
       selectedBrand: {},
       selectedStatusProduct: {},
       selectedYearPeriode: {},
+      selectedMonthPeriode: {},
 
       dataImportCsv: {
         dist_code: {
@@ -888,184 +607,88 @@ export default {
           label: "status_product",
           required: true,
         },
-        januari: {
-          label: "januari",
+        month_1: {
+          label: "month_1",
           required: true,
         },
-        februari: {
-          label: "februari",
+        month_2: {
+          label: "month_2",
           required: true,
         },
-        maret: {
-          label: "maret",
+        month_3: {
+          label: "month_3",
           required: true,
         },
-        april: {
-          label: "april",
+        month_4: {
+          label: "month_4",
           required: true,
         },
-        mei: {
-          label: "mei",
+        month_5: {
+          label: "month_5",
           required: true,
         },
-        juni: {
-          label: "juni",
+        month_6: {
+          label: "month_6",
           required: true,
         },
-        juli: {
-          label: "juli",
+        month_7: {
+          label: "month_7",
           required: true,
         },
-        agustus: {
-          label: "agustus",
+        month_8: {
+          label: "month_8",
           required: true,
         },
-        september: {
-          label: "september",
+        month_9: {
+          label: "month_9",
           required: true,
         },
-        oktober: {
-          label: "oktober",
+        month_10: {
+          label: "month_10",
           required: true,
         },
-        november: {
-          label: "november",
+        month_11: {
+          label: "month_11",
           required: true,
         },
-        desember: {
-          label: "desember",
+        month_12: {
+          label: "month_12",
           required: true,
         },
-        unit12: {
-          label: "unit12",
+        yearly_average_unit: {
+          label: "yearly_average_unit",
           required: false,
         },
-        value12: {
-          label: "value12",
+        yearly_average_value: {
+          label: "yearly_average_value",
           required: false,
         },
-        unit9: {
-          label: "unit9",
+        average_9_month_unit: {
+          label: "average_9_month_unit",
           required: false,
         },
-        value9: {
-          label: "value9",
+        average_9_month_value: {
+          label: "average_9_month_value",
           required: false,
         },
-        unit6: {
-          label: "unit6",
+        average_6_month_unit: {
+          label: "average_6_month_unit",
           required: false,
         },
-        value6: {
-          label: "value6",
+        average_6_month_value: {
+          label: "average_6_month_value",
           required: false,
         },
-        unit3: {
-          label: "unit3",
+        average_3_month_unit: {
+          label: "average_3_month_unit",
           required: false,
         },
-        value3: {
-          label: "value3",
+        average_3_month_value: {
+          label: "average_3_month_value",
           required: false,
         },
-        beli_januari: {
-          label: "beli_januari",
-          required: false,
-        },
-        januari1: {
-          label: "januari1",
-          required: false,
-        },
-        beli_februari: {
-          label: "beli_februari",
-          required: false,
-        },
-        februari1: {
-          label: "februari1",
-          required: false,
-        },
-        beli_maret: {
-          label: "beli_maret",
-          required: false,
-        },
-        maret1: {
-          label: "maret1",
-          required: false,
-        },
-        beli_april: {
-          label: "beli_april",
-          required: false,
-        },
-        april1: {
-          label: "april1",
-          required: false,
-        },
-        beli_mei: {
-          label: "beli_mei",
-          required: false,
-        },
-        mei1: {
-          label: "mei1",
-          required: false,
-        },
-        beli_juni: {
-          label: "beli_juni",
-          required: false,
-        },
-        juni1: {
-          label: "juni1",
-          required: false,
-        },
-        beli_juli: {
-          label: "beli_juli",
-          required: false,
-        },
-        juli1: {
-          label: "juli1",
-          required: false,
-        },
-        beli_agustus: {
-          label: "beli_agustus",
-          required: false,
-        },
-        agustus1: {
-          label: "agustus1",
-          required: false,
-        },
-        beli_september: {
-          label: "beli_september",
-          required: false,
-        },
-        september1: {
-          label: "september1",
-          required: false,
-        },
-        beli_oktober: {
-          label: "beli_oktober",
-          required: false,
-        },
-        oktober1: {
-          label: "oktober1",
-          required: false,
-        },
-        beli_november: {
-          label: "beli_november",
-          required: false,
-        },
-        november1: {
-          label: "november1",
-          required: false,
-        },
-        beli_desember: {
-          label: "beli_desember",
-          required: false,
-        },
-        desember1: {
-          label: "desember1",
-          required: false,
-        },
-        doi3bulan: {
-          label: "doi3bulan",
+        doi_3_month: {
+          label: "doi_3_month",
           required: false,
         },
         status_trend: {
@@ -1122,18 +745,18 @@ export default {
         Brand: "Brand",
         Kategori: "Kategori",
         StatusProduct: "StatusProduct",
-        JanuariSales: "JanuariSales",
-        FebruariSales: "FebruariSales",
-        MaretSales: "MaretSales",
-        AprilSales: "AprilSales",
-        MeiSales: "MeiSales",
-        JuniSales: "JuniSales",
-        JuliSales: "JuliSales",
-        AgustusSales: "AgustusSales",
-        SeptemberSales: "SeptemberSales",
-        OktoberSales: "OktoberSales",
-        NovemberSales: "NovemberSales",
-        DesemberSales: "DesemberSales",
+        month_1: "month_1",
+        month_2: "month_2",
+        month_3: "month_3",
+        month_4: "month_4",
+        month_5: "month_5",
+        month_6: "month_6",
+        month_7: "month_7",
+        month_8: "month_8",
+        month_9: "month_9",
+        month_10: "month_10",
+        month_11: "month_11",
+        month_12: "month_12",
         YearlyAverageUnit: "YearlyAverageUnit",
         YearlyAverageValue: "YearlyAverageValue",
         Average9BulanUnit: "Average9BulanUnit",
@@ -1142,41 +765,22 @@ export default {
         Average6BulanValue: "Average6BulanValue",
         Average3BulanUnit: "Average3BulanUnit",
         Average3BulanValue: "Average3BulanValue",
-        BeliJanuari: "BeliJanuari",
-        JanuariStock: "JanuariStock",
-        BeliFebruari: "BeliFebruari",
-        FebruariStock: "FebruariStock",
-        BeliMaret: "BeliMaret",
-        MaretStock: "MaretStock",
-        BeliApril: "BeliApril",
-        AprilStock: "AprilStock",
-        BeliMei: "BeliMei",
-        MeiStock: "MeiStock",
-        BeliJuni: "BeliJuni",
-        JuniStock: "JuniStock",
-        BeliJuli: "BeliJuli",
-        JuliStock: "JuliStock",
-        BeliAgustus: "BeliAgustus",
-        AgustusStock: "AgustusStock",
-        BeliSeptember: "BeliSeptember",
-        SeptemberStock: "SeptemberStock",
-        BeliOktober: "BeliOktober",
-        OktoberStock: "OktoberStock",
-        BeliNovember: "BeliNovember",
-        NovemberStock: "NovemberStock",
-        BeliDesember: "BeliDesember",
-        DesemberStock: "DesemberStock",
-        Doi3Bulan: "Doi3Bulan",
-        StatusTrend: "StatusTrend",
-        Delta: "Delta",
-        PIC: "PIC",
         AverageSales: "AverageSales",
         PurchaseSuggestion: "PurchaseSuggestion",
         PurchaseValue: "PurchaseValue",
+        StockOnHandUnit: "StockOnHandUnit",
+        Doi3Month: "Doi3Month",
+        StatusTrend: "StatusTrend",
+        Delta: "Delta",
+        QtyPo: "QtyPo",
+        QtyScReg: "QtyScReg",
+        ServiceLevel: "ServiceLevel",
+        PIC: "PIC",
       },
     };
   },
   async mounted() {
+    this.updateOrderedMonths();
     // await this.$root.refreshToken(localStorage.getItem("token"));
     //this.getTable();
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
@@ -1191,6 +795,26 @@ export default {
     // await this.getSelectData();
   },
   methods: {
+    updateOrderedMonths() {
+      const startIndex = this.bulanOptions.indexOf(this.selectedMonth);
+      this.orderedMonths = [
+        ...this.bulanOptions.slice(startIndex),
+        ...this.bulanOptions.slice(0, startIndex),
+      ];
+      this.fetchDataByMonth(); // Panggil fungsi untuk memperbarui data
+    },
+    fetchDataByMonth() {
+      // Misal kita pakai axios untuk request data ke server
+      axios
+        .get(`/si/monthly-sales-data=${this.selectedMonth}`)
+        .then((response) => {
+          this.tableData = response.data; // Sesuaikan dengan data yang Anda butuhkan
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    },
+
     async deleteAllData() {
       var mythis = this;
       Swal.fire({
@@ -1249,7 +873,7 @@ export default {
       return formattedNumber;
     },
     formatPercentage(value) {
-      return `${Math.round(value * 100)}%`;
+      return `${Math.round(value)}%`;
     },
     async fetchMonthlySalesData() {
       this.loading = true;
@@ -1270,7 +894,8 @@ export default {
     async getAllDatas() {
       this.isFetching = false;
 
-      const urlGetTrend = this.$root.apiHost + this.$root.prefixApi + "M_CabangAll";
+      const urlGetTrend =
+        this.$root.apiHost + this.$root.prefixApi + "M_CabangAll";
       const { data } = await axios.get(urlGetTrend);
       console.log(data, "DATAAA");
       this.dataTrend = [
@@ -1278,10 +903,6 @@ export default {
           dist_code: "All",
           region_name: "All",
           nama_cabang: "All",
-          // brand_name: "All",
-          // chnl_code: "All",
-          // status_product: "All",
-          // tahun: "All",
         },
         ...data.data,
       ];
@@ -1333,14 +954,20 @@ export default {
 
         const uniqueYearPeriodes = [];
         this.dataYearPeriode = [
-          { tahun: "All" }, // Add default "All" option
-          ...channelData.data.filter((item) => {
-            if (item.tahun && !uniqueYearPeriodes.includes(item.tahun)) {
-              uniqueYearPeriodes.push(item.tahun);
-              return true;
-            }
-            return false;
-          }),
+          // { tahun: "All" }, // Add default "All" option
+          {tahun: new Date().getFullYear()},
+          {tahun: new Date().getFullYear() - 1},
+          {tahun: new Date().getFullYear() - 2},
+          {tahun: new Date().getFullYear() - 3},
+          // {tahun: new Date().getFullYear() + 1},
+          // {tahun: new Date().getFullYear() + 2},
+          // ...channelData.data.filter((item) => {
+          //   if (item.tahun && !uniqueYearPeriodes.includes(item.tahun)) {
+          //     uniqueYearPeriodes.push(item.tahun);
+          //     return true;
+          //   }
+          //   return false;
+          // }),
         ];
       } else {
         console.warn("No channel or year data found.");
@@ -1417,57 +1044,37 @@ export default {
             brand_name: this.todo.brand_name,
             status_product: this.todo.status_product,
             tahun: this.todo.tahun,
-            januari: this.todo.januari,
-            februari: this.todo.februari,
-            maret: this.todo.maret,
-            april: this.todo.april,
-            mei: this.todo.mei,
-            juni: this.todo.juni,
-            juli: this.todo.juli,
-            agustus: this.todo.agustus,
-            september: this.todo.september,
-            oktober: this.todo.oktober,
-            november: this.todo.november,
-            desember: this.todo.desember,
-            unit12: this.todo.unit12,
-            value12: this.todo.value12,
-            unit9: this.todo.unit9,
-            value9: this.todo.value9,
-            unit6: this.todo.unit6,
-            value6: this.todo.value6,
-            unit3: this.todo.unit3,
-            value3: this.todo.value3,
-            beli_januari: this.todo.beli_januari,
-            januari1: this.todo.januari1,
-            beli_februari: this.todo.beli_februari,
-            februari1: this.todo.februari1,
-            beli_maret: this.todo.beli_maret,
-            maret1: this.todo.maret1,
-            beli_april: this.todo.beli_april,
-            april1: this.todo.april1,
-            beli_mei: this.todo.beli_mei,
-            mei1: this.todo.mei1,
-            beli_juni: this.todo.beli_juni,
-            juni1: this.todo.juni1,
-            beli_juli: this.todo.beli_juli,
-            juli1: this.todo.juli1,
-            beli_agustus: this.todo.beli_agustus,
-            agustus1: this.todo.agustus1,
-            beli_september: this.todo.beli_september,
-            september1: this.todo.september1,
-            beli_oktober: this.todo.beli_oktober,
-            oktober1: this.todo.oktober1,
-            beli_november: this.todo.beli_november,
-            november1: this.todo.november1,
-            beli_desember: this.todo.beli_desember,
-            desember1: this.todo.desember1,
-            doi3bulan: this.todo.doi3bulan,
-            status_trend: this.todo.status_trend,
-            delta: this.todo.delta,
-            pic: this.todo.pic,
+            month_1: this.todo.month_1,
+            month_2: this.todo.month_2,
+            month_3: this.todo.month_3,
+            month_4: this.todo.month_4,
+            month_5: this.todo.month_5,
+            month_6: this.todo.month_6,
+            month_7: this.todo.month_7,
+            month_8: this.todo.month_8,
+            month_9: this.todo.month_9,
+            month_10: this.todo.month_10,
+            month_11: this.todo.month_11,
+            month_12: this.todo.month_12,
+            yearly_average_unit: this.todo.yearly_average_unit,
+            yearly_average_value: this.todo.yearly_average_value,
+            average_9_month_unit: this.todo.average_9_month_unit,
+            average_9_month_value: this.todo.average_9_month_value,
+            average_6_month_unit: this.todo.average_6_month_unit,
+            average_6_month_value: this.todo.average_6_month_value,
+            average_3_month_unit: this.todo.average_3_month_unit,
+            average_3_month_value: this.todo.average_3_month_value,
             average_sales: this.todo.average_sales,
             purchase_suggestion: this.todo.purchase_suggestion,
             purchase_value: this.todo.purchase_value,
+            stock_on_hand_unit: this.todo.stock_on_hand_unit,
+            doi_3_month: this.todo.doi_3_month,
+            status_trend: this.todo.status_trend,
+            delta: this.todo.delta,
+            qty_po: this.todo.qty_po,
+            qty_sc_reg: this.todo.qty_sc_reg,
+            service_level: this.todo.service_level,
+            pic: this.todo.pic,
           },
         })
         .then((response) => {
@@ -1477,27 +1084,6 @@ export default {
         .catch((error) => {
           // handle error
           console.log(error);
-        });
-    },
-    downloadCSV() {
-      const url = `${this.$root.apiHost}${this.$root.prefixApi}trendBulky`; // Ganti dengan URL endpoint Anda
-      axios({
-        url: url,
-        method: "GET",
-        responseType: "blob", // Agar bisa mendownload file
-      })
-        .then((response) => {
-          // Buat URL untuk blob data
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "export_data.csv"); // Nama file
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link); // Bersihkan elemen link setelah digunakan
-        })
-        .catch((error) => {
-          console.error("Error saat mendownload CSV", error);
         });
     },
 
@@ -1525,9 +1111,13 @@ export default {
     async onChangeDistCodeHandler(e) {
       // this.todo.dist_code = e.dist_code;
       this.todo.dist_code = this.selectedDistCode;
-      const url = this.$root.apiHost + this.$root.prefixApi + "cabangdistcode?dist_code=" + e.dist_code;
+      const url =
+        this.$root.apiHost +
+        this.$root.prefixApi +
+        "cabangdistcode?dist_code=" +
+        e.dist_code;
       const res = await axios.get(url);
-      const data = res.data.data
+      const data = res.data.data;
       this.dataBranch = [];
 
       const uniqueBranchs = [];
@@ -1539,7 +1129,7 @@ export default {
         return false;
       });
 
-      console.log(this.dataBranch)
+      console.log(this.dataBranch);
       // data.forEach(element => {
       //   this.dataBranch.push({
       //     code: element.kode_cabang,
@@ -1551,31 +1141,25 @@ export default {
 
     onChangeRegionNameHandler(e) {
       this.todo.region_name = this.selectedRegionName;
-      // this.refreshTable();
     },
 
     onChangeBranchHandler(e) {
       this.todo.nama_cabang = e.nama_cabang;
-      // this.refreshTable();
     },
 
     onChangeChannelHandler(e) {
       this.todo.chnl_code = this.selectedChannel;
-      // this.refreshTable();
     },
 
     onChangeBrandHandler(e) {
       this.todo.brand_name = this.selectedBrand;
-      // this.refreshTable();
     },
 
     onChangeStatusProductHandler(e) {
       this.todo.status_product = this.selectedStatusProduct;
-      // this.refreshTable();
     },
     onChangeYearPeriodeHandler(e) {
       this.todo.tahun = this.selectedYearPeriode;
-      // this.refreshTable();
     },
 
     mySelectEvent() {
@@ -1640,57 +1224,37 @@ export default {
                 kategori: mythis.todo.kategori,
                 status_product: mythis.todo.status_product,
                 tahun: mythis.todo.tahun,
-                januari: mythis.todo.januari,
-                februari: mythis.todo.februari,
-                maret: mythis.todo.maret,
-                april: mythis.todo.april,
-                mei: mythis.todo.mei,
-                juni: mythis.todo.juni,
-                juli: mythis.todo.juli,
-                agustus: mythis.todo.agustus,
-                september: mythis.todo.september,
-                oktober: mythis.todo.oktober,
-                november: mythis.todo.november,
-                desember: mythis.todo.desember,
-                unit12: mythis.todo.unit12,
-                value12: mythis.todo.value12,
-                unit9: mythis.todo.unit9,
-                value9: mythis.todo.value9,
-                unit6: mythis.todo.unit6,
-                value6: mythis.todo.value6,
-                unit3: mythis.todo.unit3,
-                value3: mythis.todo.value3,
-                beli_januari: mythis.todo.beli_januari,
-                januari1: mythis.todo.januari1,
-                beli_februari: mythis.todo.beli_februari,
-                februari1: mythis.todo.februari1,
-                beli_maret: mythis.todo.beli_maret,
-                maret1: mythis.todo.maret1,
-                beli_april: mythis.todo.beli_april,
-                april1: mythis.todo.april1,
-                beli_mei: mythis.todo.beli_mei,
-                mei1: mythis.todo.mei1,
-                beli_juni: mythis.todo.beli_juni,
-                juni1: mythis.todo.juni1,
-                beli_juli: mythis.todo.beli_juli,
-                juli1: mythis.todo.juli1,
-                beli_agustus: mythis.todo.beli_agustus,
-                agustus1: mythis.todo.agustus1,
-                beli_september: mythis.todo.beli_september,
-                september1: mythis.todo.september1,
-                beli_oktober: mythis.todo.beli_oktober,
-                oktober1: mythis.todo.oktober1,
-                beli_november: mythis.todo.beli_november,
-                november1: mythis.todo.november1,
-                beli_desember: mythis.todo.beli_desember,
-                desember1: mythis.todo.desember1,
-                doi3bulan: mythis.todo.doi3bulan,
-                status_trend: mythis.todo.status_trend,
-                delta: mythis.todo.delta,
-                pic: mythis.todo.pic,
+                month_1: mythis.todo.month_1,
+                month_2: mythis.todo.month_2,
+                month_3: mythis.todo.month_3,
+                month_4: mythis.todo.month_4,
+                month_5: mythis.todo.month_5,
+                month_6: mythis.todo.month_6,
+                month_7: mythis.todo.month_7,
+                month_8: mythis.todo.month_8,
+                month_9: mythis.todo.month_9,
+                month_10: mythis.todo.month_10,
+                month_11: mythis.todo.month_11,
+                month_12: mythis.todo.month_12,
+                yearly_average_unit: mythis.todo.yearly_average_unit,
+                yearly_average_value: mythis.todo.yearly_average_value,
+                average_9_month_unit: mythis.todo.average_9_month_unit,
+                average_9_month_value: mythis.todo.average_9_month_value,
+                average_6_month_unit: mythis.todo.average_6_month_unit,
+                average_6_month_value: mythis.todo.average_6_month_value,
+                average_3_month_unit: mythis.todo.average_3_month_unit,
+                average_3_month_value: mythis.todo.average_3_month_value,
                 average_sales: mythis.todo.average_sales,
                 purchase_suggestion: mythis.todo.purchase_suggestion,
                 purchase_value: mythis.todo.purchase_value,
+                stock_on_hand_unit: mythis.todo.stock_on_hand_unit,
+                doi_3_month: mythis.todo.doi_3_month,
+                status_trend: mythis.todo.status_trend,
+                delta: mythis.todo.delta,
+                qty_po: mythis.todo.qty_po,
+                qty_sc_reg: mythis.todo.qty_sc_reg,
+                service_level: mythis.todo.service_level,
+                pic: mythis.todo.pic,
                 userid: mythis.userid,
               },
               config
@@ -1863,28 +1427,50 @@ export default {
           method: "get",
           url:
             mythis.$root.apiHost +
-            "si/monthly-sales-data?offset=" + offsetx +
-            "&limit=" + limitx +
-            (this.selectedDistCode.dist_code != undefined && this.selectedDistCode.dist_code != 'All' ? "&dist_code=" + this.selectedDistCode.dist_code : "&dist_code=") +
-            (this.selectedBranch.kode_cabang != undefined && this.selectedBranch.kode_cabang != 'All' ? "&branch=" + this.selectedBranch.kode_cabang : "&branch=") +
-            (this.selectedChannel.chnl_code != undefined && this.selectedChannel.chnl_code != 'All' ? "&chnl_code=" + this.selectedChannel.chnl_code : "&chnl_code=") +
-            (this.selectedRegionName.region_name != undefined && this.selectedRegionName.region_name != 'All' ? "&region_name=" + this.selectedRegionName.region_name : "&region_name=") +
-            (this.selectedBrand.brand_name != undefined && this.selectedBrand.brand_name != 'All' ? "&brand_name=" + this.selectedBrand.brand_name : "&brand_name=") +
-            (this.selectedStatusProduct.status_product != undefined && this.selectedStatusProduct.status_product != 'All' ? "&status_product=" + this.selectedStatusProduct.status_product : "&status_product=") +
-            (this.selectedYearPeriode.tahun != undefined && this.selectedYearPeriode.tahun != 'All' ? "&tahun=" + this.selectedYearPeriode.tahun : "&tahun=" )
-            // "&branch=" +
-            // this.selectedBranch.kode_cabang +
-            // "&chnl_code=" +
-            // this.selectedChannel.chnl_code +
-            // "&region_name=" +
-            // this.selectedRegionName.region_name +
-            // "&brand_name=" +
-            // this.selectedBrand.brand_name +
-            // "&status_product=" +
-            // this.selectedStatusProduct.status_product +
-            // "&tahun="
-            // this.selectedYearPeriode.tahun
-            ,
+            "si/monthly-sales-data?offset=" +
+            offsetx +
+            "&limit=" +
+            limitx +
+            (this.selectedDistCode.dist_code != undefined &&
+            this.selectedDistCode.dist_code != "All"
+              ? "&dist_code=" + this.selectedDistCode.dist_code
+              : "&dist_code=") +
+            (this.selectedBranch.kode_cabang != undefined &&
+            this.selectedBranch.kode_cabang != "All"
+              ? "&branch=" + this.selectedBranch.kode_cabang
+              : "&branch=") +
+            (this.selectedChannel.chnl_code != undefined &&
+            this.selectedChannel.chnl_code != "All"
+              ? "&chnl_code=" + this.selectedChannel.chnl_code
+              : "&chnl_code=") +
+            (this.selectedRegionName.region_name != undefined &&
+            this.selectedRegionName.region_name != "All"
+              ? "&region_name=" + this.selectedRegionName.region_name
+              : "&region_name=") +
+            (this.selectedBrand.brand_name != undefined &&
+            this.selectedBrand.brand_name != "All"
+              ? "&brand_name=" + this.selectedBrand.brand_name
+              : "&brand_name=") +
+            (this.selectedStatusProduct.status_product != undefined &&
+            this.selectedStatusProduct.status_product != "All"
+              ? "&status_product=" + this.selectedStatusProduct.status_product
+              : "&status_product=") +
+            (this.selectedYearPeriode.tahun != undefined &&
+            this.selectedYearPeriode.tahun != "All"
+              ? "&tahun=" + this.selectedYearPeriode.tahun
+              : "&tahun="),
+          // "&branch=" +
+          // this.selectedBranch.kode_cabang +
+          // "&chnl_code=" +
+          // this.selectedChannel.chnl_code +
+          // "&region_name=" +
+          // this.selectedRegionName.region_name +
+          // "&brand_name=" +
+          // this.selectedBrand.brand_name +
+          // "&status_product=" +
+          // this.selectedStatusProduct.status_product +
+          // "&tahun="
+          // this.selectedYearPeriode.tahun
         });
 
         console.log(reqData);
@@ -1911,57 +1497,37 @@ export default {
             Kategori: resData.results[key].kategori,
             StatusProduct: resData.results[key].status_product,
             YOP: resData.results[key].tahun,
-            JanuariSales: resData.results[key].januari,
-            FebruariSales: resData.results[key].februari,
-            MaretSales: resData.results[key].maret,
-            AprilSales: resData.results[key].april,
-            MeiSales: resData.results[key].mei,
-            JuniSales: resData.results[key].juni,
-            JuliSales: resData.results[key].juli,
-            AgustusSales: resData.results[key].agustus,
-            SeptemberSales: resData.results[key].september,
-            OktoberSales: resData.results[key].oktober,
-            NovemberSales: resData.results[key].november,
-            DesemberSales: resData.results[key].desember,
-            YearlyAverageUnit: resData.results[key].unit12,
-            YearlyAverageValue: resData.results[key].value12,
-            Average9BulanUnit: resData.results[key].unit9,
-            Average9BulanValue: resData.results[key].value9,
-            Average6BulanUnit: resData.results[key].unit6,
-            Average6BulanValue: resData.results[key].value6,
-            Average3BulanUnit: resData.results[key].unit3,
-            Average3BulanValue: resData.results[key].value3,
-            BeliJanuari: resData.results[key].beli_januari,
-            JanuariStock: resData.results[key].januari1,
-            BeliFebruari: resData.results[key].beli_februari,
-            FebruariStock: resData.results[key].februari1,
-            BeliMaret: resData.results[key].beli_maret,
-            MaretStock: resData.results[key].maret1,
-            BeliApril: resData.results[key].beli_april,
-            AprilStock: resData.results[key].april1,
-            BeliMei: resData.results[key].beli_mei,
-            MeiStock: resData.results[key].mei1,
-            BeliJuni: resData.results[key].beli_juni,
-            JuniStock: resData.results[key].juni1,
-            BeliJuli: resData.results[key].beli_juli,
-            JuliStock: resData.results[key].juli1,
-            BeliAgustus: resData.results[key].beli_agustus,
-            AgustusStock: resData.results[key].agustus1,
-            BeliSeptember: resData.results[key].beli_september,
-            SeptemberStock: resData.results[key].september1,
-            BeliOktober: resData.results[key].beli_oktober,
-            OktoberStock: resData.results[key].oktober1,
-            BeliNovember: resData.results[key].beli_november,
-            NovemberStock: resData.results[key].november1,
-            BeliDesember: resData.results[key].beli_desember,
-            DesemberStock: resData.results[key].desember1,
-            Doi3Bulan: resData.results[key].doi3bulan,
-            StatusTrend: resData.results[key].status_trend,
-            Delta: resData.results[key].delta,
-            PIC: resData.results[key].pic,
+            month_1: resData.results[key].month_1,
+            month_2: resData.results[key].month_2,
+            month_3: resData.results[key].month_3,
+            month_4: resData.results[key].month_4,
+            month_5: resData.results[key].month_5,
+            month_6: resData.results[key].month_6,
+            month_7: resData.results[key].month_7,
+            month_8: resData.results[key].month_8,
+            month_9: resData.results[key].month_9,
+            month_10: resData.results[key].month_10,
+            month_11: resData.results[key].month_11,
+            month_12: resData.results[key].month_12,
+            YearlyAverageUnit: resData.results[key].yearly_average_unit,
+            YearlyAverageValue: resData.results[key].yearly_average_value,
+            Average9BulanUnit: resData.results[key].average_9_month_unit,
+            Average9BulanValue: resData.results[key].average_9_month_value,
+            Average6BulanUnit: resData.results[key].average_6_month_unit,
+            Average6BulanValue: resData.results[key].average_6_month_value,
+            Average3BulanUnit: resData.results[key].average_3_month_unit,
+            Average3BulanValue: resData.results[key].average_3_month_value,
             AverageSales: resData.results[key].average_sales,
             PurchaseSuggestion: resData.results[key].purchase_suggestion,
             PurchaseValue: resData.results[key].purchase_value,
+            StockOnHandUnit: resData.results[key].stock_on_hand_unit,
+            Doi3Month: resData.results[key].doi_3_month,
+            StatusTrend: resData.results[key].status_trend,
+            Delta: resData.results[key].delta,
+            QtyPo: resData.results[key].qty_po,
+            QtyScReg: resData.results[key].qty_sc_reg,
+            ServiceLevel: resData.results[key].service_level,
+            PIC: resData.results[key].pic,
           };
           mythis.data_x_excel[baris_excel] = countries_x;
 
@@ -2011,230 +1577,6 @@ export default {
       const csvInput = this.$refs.csvInput.csvRef.files[0].name;
       this.fileUpload = csvInput;
       console.log(csvInput);
-    },
-    async exportPdf() {
-      const mythis = this;
-      mythis.$root.presentLoading();
-
-      try {
-        let allData = [];
-        let count = 1;
-        let nn = 0;
-        const limitx = 100;
-
-        while (count > 0) {
-          const offsetx = limitx * nn;
-
-          const reqData = await axios({
-            method: "get",
-            url:
-              mythis.$root.apiHost +
-              "si/trend?offset=" +
-              offsetx +
-              "&limit=" +
-              limitx,
-          });
-
-          const resData = reqData.data;
-          allData = [...allData, ...resData.results];
-
-          if (resData.results.length === 0 || resData.results.length < limitx) {
-            count = 0;
-          }
-
-          nn++;
-          if (nn >= 100) {
-            // Safety check to prevent infinite loop
-            count = 0;
-          }
-        }
-
-        const doc = new jsPDF();
-        let totalPagesExp = "{total_pages_count_string}";
-
-        doc.setFontSize(18);
-        doc.text("Master Trend Sales Report", 14, 22);
-        doc.setFontSize(11);
-        doc.setTextColor(100);
-
-        // Add Created By and Created At information
-        if (allData.length > 0) {
-          const firstRecord = allData[0];
-          doc.setFontSize(10);
-        }
-
-        doc.autoTable({
-          theme: "striped",
-          head: [
-            [
-              "No",
-              "Distributor",
-              "Channel",
-              "Region",
-              "Area",
-              "Cabang",
-              "Parent Code",
-              "Item Code",
-              "SKU",
-              "Brand",
-              "Kategori",
-              "Status Product",
-              "YOP",
-              "Januari Sales",
-              "Februari Sales",
-              "Maret Sales",
-              "April Sales",
-              "Mei Sales",
-              "Juni Sales",
-              "Juli Sales",
-              "Agustus Sales",
-              "September Sales",
-              "Oktober Sales",
-              "November Sales",
-              "Desember Sales",
-              "Unit 12",
-              "Value 12",
-              "Unit 9",
-              "Value 9",
-              "Unit 6",
-              "Value 6",
-              "Unit 3",
-              "Value 3",
-              "Beli Januari",
-              "Januari Stock",
-              "Beli Februari",
-              "Februari Stock",
-              "Beli Maret",
-              "Maret Stock",
-              "Beli April",
-              "April Stock",
-              "Beli Mei",
-              "Mei Stock",
-              "Beli Juni",
-              "Juni Stock",
-              "Beli Juli",
-              "Juli Stock",
-              "Beli Agustus",
-              "Agustus Stock",
-              "Beli September",
-              "September Stock",
-              "Beli Oktober",
-              "Oktober Stock",
-              "Beli November",
-              "November Stock",
-              "Beli Desember",
-              "Desember Stock",
-              "Doi 3 Bulan",
-              "Status Trend",
-              "Delta",
-              "PIC",
-              "Average Sales",
-              "Purchase Suggestion",
-              "Purchase Value",
-            ],
-          ],
-          body: allData.map((item, index) => [
-            index + 1,
-            item.dist_code,
-            item.chnl_code,
-            item.region_name,
-            item.area_name,
-            item.nama_cabang,
-            item.parent_code,
-            item.item_code,
-            item.item_name,
-            item.brand_name,
-            item.kategori,
-            item.status_product,
-            item.tahun,
-            item.januari,
-            item.februari,
-            item.maret,
-            item.april,
-            item.mei,
-            item.juni,
-            item.juli,
-            item.agustus,
-            item.september,
-            item.oktober,
-            item.november,
-            item.desember,
-            item.unit12,
-            item.value12,
-            item.unit9,
-            item.value9,
-            item.unit6,
-            item.value6,
-            item.unit3,
-            item.value3,
-            item.beli_januari,
-            item.januari1,
-            item.beli_februari,
-            item.februari1,
-            item.beli_maret,
-            item.maret1,
-            item.beli_april,
-            item.april1,
-            item.beli_mei,
-            item.mei1,
-            item.beli_juni,
-            item.juni1,
-            item.beli_juli,
-            item.juli1,
-            item.beli_agustus,
-            item.agustus1,
-            item.beli_september,
-            item.september1,
-            item.beli_oktober,
-            item.oktober1,
-            item.beli_november,
-            item.november1,
-            item.beli_desember,
-            item.desember1,
-            item.doi3bulan,
-            item.status_trend,
-            item.delta,
-            item.pic,
-            item.average_sales,
-            item.purchase_suggestion,
-            item.purchase_value,
-          ]),
-          startY: 40, // Adjusted to accommodate the new information
-          didDrawPage: function (data) {
-            // Footer
-            let str = "Page " + doc.internal.getNumberOfPages();
-            if (typeof doc.putTotalPages === "function") {
-              str = str + " of " + totalPagesExp;
-            }
-            doc.setFontSize(10);
-
-            let pageSize = doc.internal.pageSize;
-            let pageHeight = pageSize.height
-              ? pageSize.height
-              : pageSize.getHeight();
-            doc.text(str, data.settings.margin.left, pageHeight - 10);
-          },
-          showHead: "everyPage",
-        });
-
-        if (typeof doc.putTotalPages === "function") {
-          doc.putTotalPages(totalPagesExp);
-        }
-
-        const fileName =
-          "Master_Trend_Analysis_Report_" +
-          mythis.formatDate(new Date()) +
-          ".pdf";
-        doc.save(fileName);
-        console.log(fileName + " generated");
-
-        mythis.$root.stopLoading();
-        Swal.fire("Success", "PDF has been generated successfully", "success");
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        mythis.$root.stopLoading();
-        Swal.fire("Error", "Failed to generate PDF", "error");
-      }
     },
 
     show_modal() {
@@ -2303,7 +1645,12 @@ export default {
                 this.selectedYearPeriode.tahun != "All"
                   ? "&tahun=" + this.selectedYearPeriode.tahun
                   : "&tahun="
-              }`,
+              }${
+                this.selectedMonth != undefined && this.selectedMonth != "All"
+                  ? "&selected_month=" + this.selectedMonth
+                  : "&selected_month="
+              }
+                  `,
           },
         },
         search: {
@@ -2326,18 +1673,18 @@ export default {
           "KATEGORI",
           "STATUS PRODUCT",
           "YOP",
-          "I",
-          "II",
-          "III",
-          "IV",
-          "V",
-          "VI",
-          "VII",
-          "VIII",
-          "IX",
-          "X",
-          "XI",
-          "XII",
+          "MONTH 1",
+          "MONTH 2",
+          "MONTH 3",
+          "MONTH 4",
+          "MONTH 5",
+          "MONTH 6",
+          "MONTH 7",
+          "MONTH 8",
+          "MONTH 9",
+          "MONTH 10",
+          "MONTH 11",
+          "MONTH 12",
           "YEARLY AVERAGE UNIT",
           "YEARLY AVERAGE VALUE",
           "AVERAGE 9 BULAN UNIT",
@@ -2346,37 +1693,17 @@ export default {
           "AVERAGE 6 BULAN VALUE",
           "AVERAGE 3 BULAN UNIT",
           "AVERAGE 3 BULAN VALUE",
-          "BELI JANUARI",
-          "JANUARI STOCK",
-          "BELI FEBRUARI",
-          "FEBRUARI STOCK",
-          "BELI MARET",
-          "MARET STOCK",
-          "BELI APRIL",
-          "APRIL STOCK",
-          "BELI MEI",
-          "MEI STOCK",
-          "BELI JUNI",
-          "JUNI STOCK",
-          "BELI JULI",
-          "JULI STOCK",
-          "BELI AGUSTUS",
-          "AGUSTUS STOCK",
-          "BELI SEPTEMBER",
-          "SEPTEMBER STOCK",
-          "BELI OKTOBER",
-          "OKTOBER STOCK",
-          "BELI NOVEMBER",
-          "NOVEMBER STOCK",
-          "BELI DESEMBER",
-          "DESEMBER STOCK",
-          "DOI 3 BULAN",
-          "STATUS TREND",
-          "DELTA",
-          "PIC",
           "AVERAGE SALES",
           "PURCHASE SUGGESTION",
           "PURCHASE VALUE",
+          "STOCK ON HAND UNIT",
+          "DOI 3 MONTH",
+          "STATUS TREND",
+          "DELTA",
+          "QTY PO",
+          "QTY SC REG",
+          "SERVICE LEVEL",
+          "PIC",
 
           // {
           //   name: "Action",
@@ -2412,9 +1739,15 @@ export default {
             color: "#000",
             "border-bottom": "1px solid #ccc",
             "text-align": "center",
+            padding: "12px 20px",
+            "font-size": "14px",
           },
           td: {
             "text-align": "center",
+            padding: "14px 10px",
+            "font-size": "13px",
+            border: "1px solid #ddd",
+            "white-space": "nowrap",
           },
         },
         server: {
@@ -2437,232 +1770,104 @@ export default {
               html(`<span class="pull-left">${card.tahun}</span>`),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.januari
+                  card.month_1
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.februari
+                  card.month_2
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.maret
+                  card.month_3
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.april
+                  card.month_4
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.mei
+                  card.month_5
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.juni
+                  card.month_6
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.juli
+                  card.month_7
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.agustus
+                  card.month_8
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.september
+                  card.month_9
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.oktober
+                  card.month_10
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.november
+                  card.month_11
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.desember
+                  card.month_12
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.unit12
+                  card.yearly_average_unit
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.value12
+                  card.yearly_average_value
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.unit9
+                  card.average_9_month_unit
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.value9
+                  card.average_9_month_value
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.unit6
+                  card.average_6_month_unit
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.value6
+                  card.average_6_month_value
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.unit3
+                  card.average_3_month_unit
                 )}</span>`
               ),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
-                  card.value3
+                  card.average_3_month_value
                 )}</span>`
               ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_januari
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.januari1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_februari
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.februari1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_maret
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.maret1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_april
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.april1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_mei
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.mei1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_juni
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.juni1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_juli
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.juli1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_agustus
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.agustus1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_september
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.september1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_oktober
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.oktober1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_november
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.november1
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.beli_desember
-                )}</span>`
-              ),
-              html(
-                `<span class="pull-left">${mythis.formatNumber(
-                  card.desember1
-                )}</span>`
-              ),
-              html(`<span class="pull-left">${card.doi3bulan}</span>`),
-              html(`<span class="pull-left">${card.status_trend}</span>`),
-              html(
-                `<span class="pull-left">${mythis.formatPercentage(
-                  card.delta
-                )}</span>`
-              ),
-              html(`<span class="pull-left">${card.pic}</span>`),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
                   card.average_sales
@@ -2678,6 +1883,22 @@ export default {
                   card.purchase_value
                 )}</span>`
               ),
+              html(`<span class="pull-left">${card.stock_on_hand_unit}</span>`),
+              html(`<span class="pull-left">${card.doi_3_month}</span>`),
+              html(`<span class="pull-left">${card.status_trend}</span>`),
+              html(
+                `<span class="pull-left">${mythis.formatPercentage(
+                  card.delta
+                )}</span>`
+              ),
+              html(`<span class="pull-left">${card.qty_po}</span>`),
+              html(`<span class="pull-left">${card.qty_sc_reg}</span>`),
+              html(
+                `<span class="pull-left">${mythis.formatPercentage(
+                  card.service_level
+                )}</span>`
+              ),
+              html(`<span class="pull-left">${card.pic}</span>`),
             ]),
           total: (data) => data.count,
           handle: (res) => {
@@ -2768,51 +1989,27 @@ export default {
             brand_name: mythis.todo.brand_name,
             kategori: mythis.todo.kategori,
             status_product: mythis.todo.status_product,
-            januari: mythis.todo.januari,
-            februari: mythis.todo.februari,
-            maret: mythis.todo.maret,
-            april: mythis.todo.april,
-            mei: mythis.todo.mei,
-            juni: mythis.todo.juni,
-            juli: mythis.todo.juli,
-            agustus: mythis.todo.agustus,
-            september: mythis.todo.september,
-            oktober: mythis.todo.oktober,
-            november: mythis.todo.november,
-            desember: mythis.todo.desember,
-            unit12: mythis.todo.unit12,
-            value12: mythis.todo.value12,
-            unit9: mythis.todo.unit9,
-            value9: mythis.todo.value9,
-            unit6: mythis.todo.unit6,
-            value6: mythis.todo.value6,
-            unit3: mythis.todo.unit3,
-            value3: mythis.todo.value3,
-            beli_januari: mythis.todo.beli_januari,
-            januari1: mythis.todo.januari1,
-            beli_februari: mythis.todo.beli_februari,
-            februari1: mythis.todo.februari1,
-            beli_maret: mythis.todo.beli_maret,
-            maret1: mythis.todo.maret1,
-            beli_april: mythis.todo.beli_april,
-            april1: mythis.todo.april1,
-            beli_mei: mythis.todo.beli_mei,
-            mei1: mythis.todo.mei1,
-            beli_juni: mythis.todo.beli_juni,
-            juni1: mythis.todo.juni1,
-            beli_juli: mythis.todo.beli_juli,
-            juli1: mythis.todo.juli1,
-            beli_agustus: mythis.todo.beli_agustus,
-            agustus1: mythis.todo.agustus1,
-            beli_september: mythis.todo.beli_september,
-            september1: mythis.todo.september1,
-            beli_oktober: mythis.todo.beli_oktober,
-            oktober1: mythis.todo.oktober1,
-            beli_november: mythis.todo.beli_november,
-            november1: mythis.todo.november1,
-            beli_desember: mythis.todo.beli_desember,
-            desember1: mythis.todo.desember1,
-            doi3bulan: mythis.todo.doi3bulan,
+            month_1: mythis.todo.month_1,
+            month_2: mythis.todo.month_2,
+            month_3: mythis.todo.month_3,
+            month_4: mythis.todo.month_4,
+            month_5: mythis.todo.month_5,
+            month_6: mythis.todo.month_6,
+            month_7: mythis.todo.month_7,
+            month_8: mythis.todo.month_8,
+            month_9: mythis.todo.month_9,
+            month_10: mythis.todo.month_10,
+            month_11: mythis.todo.month_11,
+            month_12: mythis.todo.month_12,
+            yearly_average_unit: mythis.todo.yearly_average_unit,
+            yearly_average_value: mythis.todo.yearly_average_value,
+            average_9_month_unit: mythis.todo.average_9_month_unit,
+            average_9_month_value: mythis.todo.average_9_month_value,
+            average_6_month_unit: mythis.todo.average_6_month_unit,
+            average_6_month_value: mythis.todo.average_6_month_value,
+            average_3_month_unit: mythis.todo.average_3_month_unit,
+            average_3_month_value: mythis.todo.average_3_month_value,
+            doi_3_month: mythis.todo.doi_3_month,
             status_trend: mythis.todo.status_trend,
             delta: mythis.todo.delta,
             pic: mythis.todo.pic,
@@ -2894,60 +2091,42 @@ export default {
           mythis.todo.brand_name = res.data.data.brand_name;
           mythis.todo.kategori = res.data.data.kategori;
           mythis.todo.status_product = res.data.data.status_product;
-          mythis.todo.januari = res.data.data.januari;
-          mythis.todo.februari = res.data.data.februari;
-          mythis.todo.maret = res.data.data.maret;
-          mythis.todo.april = res.data.data.april;
-          mythis.todo.mei = res.data.data.mei;
-          mythis.todo.juni = res.data.data.juni;
-          mythis.todo.juli = res.data.data.juli;
-          mythis.todo.agustus = res.data.data.agustus;
-          mythis.todo.september = res.data.data.september;
-          mythis.todo.oktober = res.data.data.oktober;
-          mythis.todo.november = res.data.data.november;
-          mythis.todo.desember = res.data.data.desember;
-          mythis.todo.unit12 = res.data.data.unit12;
-          mythis.todo.value12 = res.data.data.value12;
-          mythis.todo.unit9 = res.data.data.unit9;
-          mythis.todo.value9 = res.data.data.value9;
-          mythis.todo.unit6 = res.data.data.unit6;
-          mythis.todo.value6 = res.data.data.value6;
-          mythis.todo.unit3 = res.data.data.unit3;
-          mythis.todo.value3 = res.data.data.value3;
-          mythis.todo.beli_januari = res.data.data.beli_januari;
-          mythis.todo.januari1 = res.data.data.januari1;
-          mythis.todo.beli_februari = res.data.data.beli_februari;
-          mythis.todo.februari1 = res.data.data.februari1;
-          mythis.todo.beli_maret = res.data.data.beli_maret;
-          mythis.todo.maret1 = res.data.data.maret1;
-          mythis.todo.beli_april = res.data.data.beli_april;
-          mythis.todo.april1 = res.data.data.april1;
-          mythis.todo.beli_mei = res.data.data.beli_mei;
-          mythis.todo.mei1 = res.data.data.mei1;
-          mythis.todo.beli_juni = res.data.data.beli_juni;
-          mythis.todo.juni1 = res.data.data.juni1;
-          mythis.todo.beli_juli = res.data.data.beli_juli;
-          mythis.todo.juli1 = res.data.data.juli1;
-          mythis.todo.beli_agustus = res.data.data.beli_agustus;
-          mythis.todo.agustus1 = res.data.data.agustus1;
-          mythis.todo.beli_september = res.data.data.beli_september;
-          mythis.todo.september1 = res.data.data.september1;
-          mythis.todo.beli_oktober = res.data.data.beli_oktober;
-          mythis.todo.oktober1 = res.data.data.oktober1;
-          mythis.todo.beli_november = res.data.data.beli_november;
-          mythis.todo.november1 = res.data.data.november1;
-          mythis.todo.beli_desember = res.data.data.beli_desember;
-          mythis.todo.desember1 = res.data.data.desember1;
-          mythis.todo.doi3bulan = res.data.data.doi3bulan;
-          mythis.todo.status_trend = res.data.data.status_trend;
-          mythis.todo.delta = res.data.data.delta;
-          mythis.todo.pic = res.data.data.pic;
+          mythis.todo.month_1 = res.data.data.month_1;
+          mythis.todo.month_2 = res.data.data.month_2;
+          mythis.todo.month_3 = res.data.data.month_3;
+          mythis.todo.month_4 = res.data.data.month_4;
+          mythis.todo.month_5 = res.data.data.month_5;
+          mythis.todo.month_6 = res.data.data.month_6;
+          mythis.todo.month_7 = res.data.data.month_7;
+          mythis.todo.month_8 = res.data.data.month_8;
+          mythis.todo.month_9 = res.data.data.month_9;
+          mythis.todo.month_10 = res.data.data.month_10;
+          mythis.todo.month_11 = res.data.data.month_11;
+          mythis.todo.month_12 = res.data.data.month_12;
+          mythis.todo.yearly_average_unit = res.data.data.yearly_average_unit;
+          mythis.todo.yearly_average_value = res.data.data.yearly_average_value;
+          mythis.todo.average_9_month_unit = res.data.data.average_9_month_unit;
+          mythis.todo.average_9_month_value =
+            res.data.data.average_9_month_value;
+          mythis.todo.average_6_month_unit = res.data.data.average_6_month_unit;
+          mythis.todo.average_6_month_value =
+            res.data.data.average_6_month_value;
+          mythis.todo.average_3_month_unit = res.data.data.average_3_month_unit;
+          mythis.todo.average_3_month_value =
+            res.data.data.average_3_month_value;
           mythis.todo.average_sales = res.data.data.average_sales;
           mythis.todo.purchase_suggestion = res.data.data.purchase_suggestion;
           mythis.todo.purchase_value = res.data.data.purchase_value;
+          mythis.todo.stock_on_hand_unit = res.data.data.stock_on_hand_unit;
+          mythis.todo.doi_3_month = res.data.data.doi_3_month;
+          mythis.todo.status_trend = res.data.data.status_trend;
+          mythis.todo.delta = res.data.data.delta;
+          mythis.todo.qty_po = res.data.data.qty_po;
+          mythis.todo.qty_sc_reg = res.data.data.qty_sc_reg;
+          mythis.todo.service_level = res.data.data.service_level;
+          mythis.todo.pic = res.data.data.pic;
 
           document.getElementById("inputA").focus(); // sets the focus on the input
-
           mythis.$root.stopLoading();
         });
     },
@@ -2956,6 +2135,63 @@ export default {
 </script>
 
 <style scoped>
+/* Container utama untuk dropdown bulan */
+.month-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 300px; /* Sesuaikan lebar sesuai kebutuhan */
+  margin-bottom: 10px;
+}
+
+/* Label untuk dropdown */
+.month-label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* Wrapper untuk icon dan dropdown */
+.month-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Styling untuk dropdown bulan */
+.month-dropdown {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #333;
+  appearance: none;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efek hover dan fokus pada dropdown */
+.month-dropdown:hover {
+  border-color: #007bff;
+}
+
+.month-dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Icon untuk dropdown */
+.month-dropdown-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #333;
+  font-size: 12px;
+}
 .input-error {
   border: red 1px solid;
 }

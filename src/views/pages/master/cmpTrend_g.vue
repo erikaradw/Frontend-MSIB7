@@ -1,5 +1,9 @@
 <template>
   <!---------------------------- Modal -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
   <div
     :class="modal ? 'modal fade in' : 'modal fade'"
     id="exampleModalCenter"
@@ -422,6 +426,116 @@
         </vue-csv-import> -->
 
         <!-- <br /> -->
+        <table class="table-trend2" hidden v-if="tableTrend.length > 0">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>DISTRIBUTOR</th>
+              <th>CHANNEL</th>
+              <th>REGION</th>
+              <th>AREA</th>
+              <th>CABANG CODE</th>
+              <th>NAMA CABANG</th>
+              <th>PARENT CODE</th>
+              <th>ITEM CODE</th>
+              <th>SKU</th>
+              <th>BRAND</th>
+              <th>KATEGORI</th>
+              <th>STATUS PRODUCT</th>
+              <th>YOP</th>
+              <th>JANUARI SALES</th>
+              <th>FEBRUARI SALES</th>
+              <th>MARET SALES</th>
+              <th>APRIL SALES</th>
+              <th>MEI SALES</th>
+              <th>JUNI SALES</th>
+              <th>JULI SALES</th>
+              <th>AGUSTUS SALES</th>
+              <th>SEPTEMBER SALES</th>
+              <th>OKTOBER SALES</th>
+              <th>NOVEMBER SALES</th>
+              <th>DESEMBER SALES</th>
+              <th>BELI JANUARI</th>
+              <th>BELI FEBRUARI</th>
+              <th>BELI MARET</th>
+              <th>BELI APRIL</th>
+              <th>BELI MEI</th>
+              <th>BELI JUNI</th>
+              <th>BELI JULI</th>
+              <th>BELI AGUSTUS</th>
+              <th>BELI SEPTEMBER</th>
+              <th>BELI OKTOBER</th>
+              <th>BELI NOVEMBER</th>
+              <th>BELI DESEMBER</th>
+              <th>JANUARI STOCK</th>
+              <th>FEBRUARI STOCK</th>
+              <th>MARET STOCK</th>
+              <th>APRIL STOCK</th>
+              <th>MEI STOCK</th>
+              <th>JUNI STOCK</th>
+              <th>JULI STOCK</th>
+              <th>AGUSTUS STOCK</th>
+              <th>SEPTEMBER STOCK</th>
+              <th>OKTOBER STOCK</th>
+              <th>NOVEMBER STOCK</th>
+              <th>DESEMBER STOCK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in tableTrend" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ item.dist_code }}</td>
+              <td>{{ item.chnl_code }}</td>
+              <td>{{ item.region_name }}</td>
+              <td>{{ item.area_name }}</td>
+              <td>{{ item.kode_cabang }}</td>
+              <td>{{ item.nama_cabang }}</td>
+              <td>{{ item.parent_code }}</td>
+              <td>{{ item.item_code }}</td>
+              <td>{{ item.item_name }}</td>
+              <td>{{ item.brand_name }}</td>
+              <td>{{ item.kategori }}</td>
+              <td>{{ item.status_product }}</td>
+              <td>{{ item.tahun }}</td>
+              <td>{{ item.januari }}</td>
+              <td>{{ item.februari }}</td>
+              <td>{{ item.maret }}</td>
+              <td>{{ item.april }}</td>
+              <td>{{ item.mei }}</td>
+              <td>{{ item.juni }}</td>
+              <td>{{ item.juli }}</td>
+              <td>{{ item.agustus }}</td>
+              <td>{{ item.september }}</td>
+              <td>{{ item.oktober }}</td>
+              <td>{{ item.november }}</td>
+              <td>{{ item.desember }}</td>
+              <td>{{ item.beli_januari }}</td>
+              <td>{{ item.beli_februari }}</td>
+              <td>{{ item.beli_maret }}</td>
+              <td>{{ item.beli_april }}</td>
+              <td>{{ item.beli_mei }}</td>
+              <td>{{ item.beli_juni }}</td>
+              <td>{{ item.beli_juli }}</td>
+              <td>{{ item.beli_agustus }}</td>
+              <td>{{ item.beli_september }}</td>
+              <td>{{ item.beli_oktober }}</td>
+              <td>{{ item.beli_november }}</td>
+              <td>{{ item.beli_desember }}</td>
+              <td>{{ item.januari1 }}</td>
+              <td>{{ item.februari1 }}</td>
+              <td>{{ item.maret1 }}</td>
+              <td>{{ item.april1 }}</td>
+              <td>{{ item.mei1 }}</td>
+              <td>{{ item.juni1 }}</td>
+              <td>{{ item.juli1 }}</td>
+              <td>{{ item.agustus1 }}</td>
+              <td>{{ item.september1 }}</td>
+              <td>{{ item.oktober1 }}</td>
+              <td>{{ item.november1 }}</td>
+              <td>{{ item.desember1 }}</td>
+            </tr>
+          </tbody>
+        </table>
         <button
           v-if="csv != null"
           @click="saveTodoBulky()"
@@ -435,7 +549,7 @@
         <br />
         <br /> -->
         <div class="button-container">
-          <download-excel
+          <!-- <download-excel
             class="button"
             :data="json_data"
             :fields="json_fields"
@@ -444,14 +558,14 @@
             :before-generate="startDownload"
             :before-finish="finishDownload"
             type="xlsx"
+          > -->
+          <button
+            class="btn btn-sm btn-info pull-left"
+            @click="exportDetailToXLS()"
           >
-            <button
-              class="btn btn-sm btn-info pull-left"
-              @click="download_excel_xyz()"
-            >
-              <i class="fas fa-file-excel"></i>Export Excel
-            </button>
-          </download-excel>
+            <i class="fas fa-file-excel"></i>Export Excel
+          </button>
+          <!-- </download-excel> -->
 
           <!-- <button
             class="btn btn-sm btn-primary pull-right"
@@ -460,171 +574,27 @@
             <i class="fas fa-file-pdf"></i>Export PDF
           </button> -->
         </div>
+
+        <div class="dropdown-container col-sm-3">
+          <label for="select-item" class="dropdown-label">YEAR PERIODE</label>
+          <div class="dropdown-wrapper">
+            <select
+              v-model="selectedYearPeriode"
+              class="dropdown-year"
+              id="select-item"
+              @change="onChangeYearPeriodeHandler"
+            >
+              <option v-for="year in dataYearPeriode" :key="year" :value="year">
+                {{ year }}
+              </option>
+            </select>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+            <!-- Icon Chevron untuk dropdown -->
+          </div>
+        </div>
         <br />
 
         <!-- <button
-          v-if="status_table && $root.accessRoles[access_page].create"
-          class="btn btn-sm btn-success pull-right"
-          @click="show_modal()"
-        >
-          ADD DATA
-        </button> -->
-
-        <!-- <div>
-          <button
-            @click="downloadCSV"
-            :disabled="isLoading"
-            class="btn btn-primary btn-sm"
-          >
-            {{ isLoading ? "Downloading..." : "Download CSV" }}
-          </button>
-        </div> -->
-
-        <!-- <div class="row row-cols-2">
-          <div class="col-md-12">
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">DISTRIBUTOR</label>
-              </div>
-              <v-select
-                id="select-dist_code"
-                variant="outlined"
-                label="dist_code"
-                name="dist_code"
-                :options="dataDistCode"
-                placeholder="Select Dist Code"
-                :disabled="isFetching"
-                v-model="selectedDistCode"
-                @update:modelValue="onChangeDistCodeHandler"
-              ></v-select>
-            </div>
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">REGION</label>
-              </div>
-              <v-select
-                id="select-region_name"
-                variant="outlined"
-                label="region_name"
-                name="region_name"
-                :options="dataRegionName"
-                placeholder="Select Region Code"
-                :disabled="isFetching"
-                v-model="selectedRegionName"
-                @update:modelValue="onChangeRegionNameHandler"
-              ></v-select>
-            </div>
-          </div>
-        </div>
-
-        <br />
-        <div class="row row-cols-2">
-          <div class="col-md-12">
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">BRANCH</label>
-              </div>
-              <v-select
-                id="select-nama_cabang"
-                variant="outlined"
-                label="nama_cabang"
-                name="nama_cabang"
-                :options="dataBranch"
-                placeholder="Select Branch"
-                :disabled="isFetching"
-                v-model="selectedBranch"
-                @update:modelValue="onChangeBranchHandler"
-              ></v-select>
-            </div>
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">CHANNEL</label>
-              </div>
-              <v-select
-                id="select-chnl_code"
-                variant="outlined"
-                label="chnl_code"
-                name="chnl_code"
-                :options="dataChannel"
-                placeholder="Select Channel"
-                :disabled="isFetching"
-                v-model="selectedChannel"
-                @update:modelValue="onChangeChannelHandler"
-              ></v-select>
-            </div>
-          </div>
-          <br />
-        </div>
-        <br />
-        <div class="row row-cols-2">
-          <div class="col-md-12">
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">BRAND</label>
-              </div>
-              <v-select
-                id="select-brand_name"
-                variant="outlined"
-                label="brand_name"
-                name="brand_name"
-                :options="dataBrand"
-                placeholder="Select Brand"
-                :disabled="isFetching"
-                v-model="selectedBrand"
-                @update:modelValue="onChangeBrandHandler"
-              ></v-select>
-            </div>
-
-            <div class="col-md-6">
-              <div>
-                <label for="select-item">STATUS PRODUCT</label>
-              </div>
-              <v-select
-                id="select-status_product"
-                variant="outlined"
-                label="status_product"
-                name="status_product"
-                :options="dataStatusProduct"
-                placeholder="Select Status Product"
-                :disabled="isFetching"
-                v-model="selectedStatusProduct"
-                @update:modelValue="onChangeStatusProductHandler"
-              ></v-select>
-            </div>
-
-            <div class="row row-cols-2">
-              <div class="col-md-12">
-                <br />
-                <div class="col-md-6">
-                  <div>
-                    <label for="select-item">YEAR PERIODE</label>
-                  </div>
-                  <v-select
-                    id="select-tahun"
-                    variant="outlined"
-                    label="tahun"
-                    name="tahun"
-                    :options="dataYearPeriode"
-                    placeholder="Select Year Periode"
-                    :disabled="isFetching"
-                    v-model="selectedYearPeriode"
-                    @update:modelValue="onChangeYearPeriodeHandler"
-                  ></v-select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <br /><br /><br /> -->
-
-        <!-- <div class="centered-button-wrapper">
-          <button
-            @click="refreshTable"
-            class="btn btn-primary btn-sm pull-left"
-          >
-            SHOW DATA
-          </button> -->
-          <!-- <button
             class="btn btn-sm btn-primary"
             data-toggle="tooltip"
             title="Process"
@@ -632,7 +602,7 @@
           >
             <i class=""></i> PROCESS
           </button> -->
-          <!-- <button
+        <!-- <button
             class="btn btn-sm btn-danger pull-right"
             data-toggle="tooltip"
             title="Delete All Data"
@@ -656,6 +626,7 @@
 
 <script>
 import axios from "axios";
+import * as XLSX from "xlsx";
 import { markRaw } from "vue";
 import { Grid, h, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
@@ -680,6 +651,7 @@ export default {
   },
   data() {
     return {
+      tableTrend: [],
       access_page: this.$root.decryptData(localStorage.getItem("halaman")),
       isLogin: localStorage.getItem("token") != null ? 1 : 0,
       activemenu: null,
@@ -735,6 +707,11 @@ export default {
         november1: false,
         desember1: false,
       },
+      // watch: {
+      //   selectedYearPeriode(newYear) {
+      //     this.filterTableByYear(newYear);
+      //   },
+      // },
 
       userid: 0,
       status_table: false,
@@ -796,21 +773,9 @@ export default {
       csv: null,
 
       dataTrend: [],
-      dataRegionName: [],
-      dataBrand: [],
-      dataBranch: [],
-      dataDistCode: [],
-      dataChannel: [],
-      dataStatusProduct: [],
-      dataYearPeriode: [],
 
-      selectedDistCode: {},
-      selectedRegionName: {},
-      selectedBranch: {},
-      selectedChannel: {},
-      selectedBrand: {},
-      selectedStatusProduct: {},
-      selectedYearPeriode: {},
+      dataYearPeriode: [],
+      selectedYearPeriode: [],
 
       dataImportCsv: {
         dist_code: {
@@ -1077,11 +1042,69 @@ export default {
     // await this.getChannelForm();
     // await this.getBrandForm();
     // await this.getStatusProductForm();
-    await this.fetchMonthlySalesData();
+    // await this.fetchMonthlySalesData();
     await this.getAllDatas();
+    await this.getTrendTable();
     // await this.getSelectData();
   },
   methods: {
+    async filterTableByYear(year) {
+      try {
+        // Fetch the filtered data based on the selected year
+        const response = await axios.get(`monthly-sales-trend-g`, {
+          params: { year: year },
+        });
+
+        // Assuming response.data.results is the filtered data array
+        this.tableTrend = response.data.results;
+      } catch (error) {
+        console.error("Error filtering data by year:", error);
+      }
+    },
+    async getTrendTable() {
+      let offset = 0;
+      const limit = 100;
+      this.tableTrend = []; // Menyimpan semua data hasil looping
+
+      try {
+        while (offset < 1000) {
+          const response = await axios.get(
+            `http://178.1.7.230:8207/si/monthly-sales-trend-g?limit=${limit}&offset=${offset}`
+          );
+          const results = response.data.results;
+
+          // Menggabungkan hasil dari setiap pemanggilan ke `this.tableTrend`
+          this.tableTrend = [...this.tableTrend, ...results];
+
+          // Tambahkan offset sebesar limit setiap kali iterasi
+          offset += limit;
+
+          // Check jika data hasil response kosong, maka hentikan proses
+          if (results.length === 0) break;
+        }
+
+        console.log("Total data fetched:", this.tableTrend.length);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+
+    exportDetailToXLS() {
+      try {
+        console.log(this.tableTrend);
+
+        const tables = document.querySelector(".table-trend2");
+        const wb = XLSX.utils.table_to_book(tables, {
+          sheet: "Sheet JS",
+          bookType: "xls",
+        });
+        XLSX.writeFile(wb, "TrendSales.xls");
+
+        // this.$root.loader = true;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
     async deleteAllData() {
       var mythis = this;
       Swal.fire({
@@ -1156,105 +1179,20 @@ export default {
       }
     },
     async getAllDatas() {
-      this.isFetching = true;
-
+      // Code to fetch and populate dataYearPeriode
       const urlGetTrend =
-        this.$root.apiHost + this.$root.prefixApi + "trendAll";
-      const { data } = await axios.get(urlGetTrend);
-      this.dataTrend = [
-        {
-          brand_name: "All",
-          chnl_code: "All",
-          dist_code: "All",
-          region_name: "All",
-          nama_cabang: "All",
-          status_product: "All",
-          tahun: "All",
-        },
-        ...data.results,
-      ];
-
-      const uniqueDistCodes = [];
-      this.dataDistCode = this.dataTrend.filter((item) => {
-        if (!uniqueDistCodes.includes(item.dist_code)) {
-          uniqueDistCodes.push(item.dist_code);
-          return true;
+        this.$root.apiHost + this.$root.prefixApi + "tahunTrend";
+      try {
+        const response = await axios.get(urlGetTrend);
+        if (response.data.status && response.data.data) {
+          this.dataYearPeriode = response.data.data
+            .map((item) => item.tahun)
+            .filter((year) => year !== "Total");
+          // this.selectedYearPeriode = this.dataYearPeriode[0] || null;
         }
-        return false;
-      });
-
-      const uniqueRegionCodes = [];
-      this.dataRegionName = this.dataTrend.filter((item) => {
-        if (!uniqueRegionCodes.includes(item.region_name)) {
-          uniqueRegionCodes.push(item.region_name);
-          return true;
-        }
-        return false;
-      });
-
-      const uniqueBranchs = [];
-      this.dataBranch = this.dataTrend.filter((item) => {
-        if (!uniqueBranchs.includes(item.nama_cabang)) {
-          uniqueBranchs.push(item.nama_cabang);
-          return true;
-        }
-        return false;
-      });
-
-      const uniqueChannels = [];
-      this.dataChannel = this.dataTrend.filter((item) => {
-        if (!uniqueChannels.includes(item.chnl_code)) {
-          uniqueChannels.push(item.chnl_code);
-          return true;
-        }
-        return false;
-      });
-
-      const uniqueBrands = [];
-      this.dataBrand = this.dataTrend.filter((item) => {
-        if (!uniqueBrands.includes(item.brand_name)) {
-          uniqueBrands.push(item.brand_name);
-          return true;
-        }
-        return false;
-      });
-
-      const uniqueStatusProducts = [];
-      this.dataStatusProduct = this.dataTrend.filter((item) => {
-        if (!uniqueStatusProducts.includes(item.status_product)) {
-          uniqueStatusProducts.push(item.status_product);
-          return true;
-        }
-        return false;
-      });
-
-      const uniqueYearPeriodes = [];
-      this.dataYearPeriode = this.dataTrend.filter((item) => {
-        if (!uniqueYearPeriodes.includes(item.tahun)) {
-          uniqueYearPeriodes.push(item.tahun);
-          return true;
-        }
-        return false;
-      });
-
-      console.log(this.dataDistCode, "data DistCode");
-      console.log(this.dataRegionName, "data region_name");
-      console.log(this.dataBranch, "data branch");
-      console.log(this.dataChannel, "data chnl_code");
-      console.log(this.dataBrand, "data brand_name");
-      console.log(this.dataStatusProduct, "data status_product");
-      console.log(this.dataYearPeriode, "data tahun");
-
-      this.selectedBranch = this.dataTrend[0];
-      this.selectedDistCode = this.dataTrend[0];
-      this.selectedRegionName = this.dataTrend[0];
-      this.selectedChannel = this.dataTrend[0];
-      this.selectedStatusProduct = this.dataTrend[0];
-      this.selectedBrand = this.dataTrend[0];
-      this.selectedYearPeriode = this.dataTrend[0];
-
-      this.isFetching = false;
-      //this.refreshTable();
+      } catch (error) {
+        console.error("Error fetching year data:", error);
+      }
     },
     searchData() {
       axios
@@ -1395,7 +1333,7 @@ export default {
     },
     onChangeYearPeriodeHandler(e) {
       this.todo.tahun = this.selectedYearPeriode;
-      // this.refreshTable();
+      this.refreshTable();
     },
 
     mySelectEvent() {
@@ -2006,7 +1944,7 @@ export default {
         mythis.deleteTodo(id);
       });
     },
-    getTable() {
+    async getTable() {
       var mythis = this;
       this.grid = new Grid();
       this.grid.updateConfig({
@@ -2018,41 +1956,10 @@ export default {
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
                 page * limit
               }${
-                this.selectedDistCode.dist_code != undefined &&
-                this.selectedDistCode.dist_code != "All"
-                  ? "&dist_code=" + this.selectedDistCode.dist_code
-                  : ""
-              }${
-                this.selectedRegionName.region_name != undefined &&
-                this.selectedRegionName.region_name != "All"
-                  ? "&region_name=" + this.selectedRegionName.region_name
-                  : ""
-              }${
-                this.selectedBranch.nama_cabang != undefined &&
-                this.selectedBranch.nama_cabang != "All"
-                  ? "&branch=" + this.selectedBranch.nama_cabang
-                  : ""
-              }${
-                this.selectedChannel.chnl_code != undefined &&
-                this.selectedChannel.chnl_code != "All"
-                  ? "&chnl_code=" + this.selectedChannel.chnl_code
-                  : ""
-              }${
-                this.selectedBrand.brand_name != undefined &&
-                this.selectedBrand.brand_name != "All"
-                  ? "&brand_name=" + this.selectedBrand.brand_name
-                  : ""
-              }${
-                this.selectedStatusProduct.status_product != undefined &&
-                this.selectedStatusProduct.status_product != "All"
-                  ? "&status_product=" +
-                    this.selectedStatusProduct.status_product
-                  : ""
-              }${
-                this.selectedYearPeriode.tahun != undefined &&
-                this.selectedYearPeriode.tahun != "All"
-                  ? "&tahun=" + this.selectedYearPeriode.tahun
-                  : ""
+                this.selectedYearPeriode != undefined &&
+                this.selectedYearPeriode != "All"
+                  ? "&tahun=" + this.selectedYearPeriode
+                  : "&tahun="
               }`,
           },
         },
@@ -2145,17 +2052,25 @@ export default {
             "min-width": "100%",
           },
           th: {
-            "background-color": "rgba(0, 55, 255, 0.1)",
+            "background-color": "rgba(0, 55, 255, 0.1)", // Latar belakang header
             color: "#000",
-            "border-bottom": "1px solid #ccc",
-            "text-align": "center",
+            "border-bottom": "1px solid #ccc", // Garis bawah pada header
+            "text-align": "center", // Perataan teks di tengah
+            padding: "12px 20px",
+            "font-size": "14px",
+            "white-space": "nowrap",
           },
           td: {
-            "text-align": "center",
+            "text-align": "center", // Perataan teks di tengah untuk isi tabel
+            padding: "14px 10px", // Padding untuk ruang pada data tabel
+            "font-size": "13px", // Ukuran font pada data tabel
+            border: "1px solid #ddd", // Border antar sel tabel
+            "white-space": "nowrap", // Mencegah teks membungkus
           },
         },
         server: {
-          url: this.$root.apiHost + this.$root.prefixApi + "monthly-sales-trend-g", // "trend",
+          url:
+            this.$root.apiHost + this.$root.prefixApi + "monthly-sales-trend-g", // "trend",
           then: (data) =>
             data.results.map((card) => [
               card.id,
@@ -2671,5 +2586,59 @@ export default {
 
 .centered-button-wrapper button {
   margin: 0 10px; /* Jarak antar button */
+}
+/* Styling untuk container dropdown */
+.dropdown-container {
+  margin-bottom: 10px;
+}
+
+/* Styling untuk label */
+.dropdown-label {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+/* Styling wrapper untuk membuat icon berada di dalam */
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Styling untuk dropdown */
+.dropdown-year {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #333;
+  appearance: none; /* Hapus tampilan default browser */
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Styling saat hover dan fokus */
+.dropdown-year:hover {
+  border-color: #007bff;
+}
+
+.dropdown-year:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Icon di dalam dropdown */
+.dropdown-icon {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #333;
+  font-size: 12px;
 }
 </style>
