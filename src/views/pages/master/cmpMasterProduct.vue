@@ -107,7 +107,8 @@
                         : 'form-control input-lg'
                     "
                     @input="
-                      (val) => (todo.parent_code = todo.parent_code.toUpperCase())
+                      (val) =>
+                        (todo.parent_code = todo.parent_code.toUpperCase())
                     "
                   />
                 </div>
@@ -293,7 +294,7 @@
       <!-- Block Title -->
       <div class="block-title">
         <h2>
-          <strong>MENU {{ $root.judulHalaman }}</strong>
+          <strong>MENU PRODUCT {{ $root.judulHalaman }}</strong>
         </h2>
 
         <i v-if="!status_table" class="fa fa-spinner fa-spin text-default"></i>
@@ -1308,19 +1309,21 @@ export default {
               mythis.$root.accessRoles[mythis.access_page].delete
                 ? html(
                     `
-                    <button data-id="${row.cells[0].data}" class="btn btn-sm btn-warning text-white" id="editData" data-toggle="tooltip" title="Edit" ><i class="fa fa-pencil-square-o"></i></button>
-                    &nbsp;&nbsp;&nbsp;
-                    <button data-id="${row.cells[0].data}" class="btn btn-sm btn-danger text-white" id="deleteData" data-toggle="tooltip" title="Delete" ><i class="fa fa-trash-o"></i></button>
-                  `
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-primary text-white" id="editData" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+          &nbsp;&nbsp;&nbsp;
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-o"></i></button>
+        `
                   )
                 : mythis.$root.accessRoles[mythis.access_page].update
                 ? html(
                     `
-                    <button data-id="${row.cells[0].data}" class="btn btn-sm btn-warning text-white" id="editData" data-toggle="tooltip" title="Edit" ><i class="fa fa-pencil-square-o"></i></button>`
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-primary text-white" id="editData" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square-o"></i></button>`
                   )
                 : mythis.$root.accessRoles[mythis.access_page].delete
-                ? html(`&nbsp;&nbsp;&nbsp;
-                    <button data-id="${row.cells[0].data}" class="btn btn-sm btn-danger text-white" id="deleteData" data-toggle="tooltip" title="Delete" ><i class="fa fa-trash-o"></i></button>`)
+                ? html(
+                    `&nbsp;&nbsp;&nbsp;
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-o"></i></button>`
+                  )
                 : ``,
           },
         ],
@@ -1331,13 +1334,22 @@ export default {
             "min-width": "100%",
           },
           th: {
-            "background-color": "rgba(0, 55, 255, 0.1)",
-            color: "#000",
-            "border-bottom": "1px solid #ccc",
-            "text-align": "center",
+            background: "linear-gradient(135deg, #3a8fb7, #1a5b92)", // Gradient background
+            color: "#ffffff", // White text color for contrast
+            "border-bottom": "2px solid #1a5b92", // Darker border for header bottom
+            "text-align": "center", // Center-align header text
+            padding: "12px 20px",
+            "font-size": "14px",
+            "font-weight": "bold", // Bold font for header
+            "white-space": "nowrap",
+            "text-shadow": "1px 1px 2px rgba(0, 0, 0, 0.3)", // Subtle text shadow for depth
           },
           td: {
-            "text-align": "center",
+            "text-align": "center", // Center-align table cell text
+            padding: "14px 10px", // Padding for table cell data
+            "font-size": "13px", // Font size for table cell data
+            border: "1px solid #ddd", // Border between table cells
+            "white-space": "nowrap", // Prevent text wrapping
           },
         },
         server: {
@@ -1570,25 +1582,22 @@ export default {
   transition: background 0.3s, transform 0.3s; /* Smooth transition */
 }
 
-.btn-info {
-  background-color: #17a2b8; /* Info button background color */
-  color: white; /* Text color */
-}
-
-.btn-info:hover {
-  background-color: #138496; /* Darker shade on hover */
-  transform: scale(1.05); /* Slightly enlarges button on hover */
-}
-
 .btn-primary {
-  background-color: #5895d6; /* Primary button background color */
-  color: white; /* Text color */
+  background-color: #1a5b92; /* Biru tua sesuai dengan tema header tabel */
+  color: white;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3; /* Darker shade on hover */
-  transform: scale(1.05); /* Slightly enlarges button on hover */
+.btn-info {
+  background-color: #3a8fb7; /* Biru terang sesuai dengan tema header tabel */
+  color: white;
 }
+
+.btn-primary:hover,
+.btn-info:hover {
+  transform: scale(1.05); /* Efek sedikit membesar saat hover */
+  opacity: 0.9; /* Menambahkan efek hover */
+}
+
 .modal-body {
   overflow-x: auto;
   margin-right: 10px;

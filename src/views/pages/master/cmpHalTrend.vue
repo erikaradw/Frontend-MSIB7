@@ -1735,19 +1735,22 @@ export default {
             "min-width": "100%",
           },
           th: {
-            "background-color": "rgba(0, 55, 255, 0.1)",
-            color: "#000",
-            "border-bottom": "1px solid #ccc",
-            "text-align": "center",
+            background: "linear-gradient(135deg, #3a8fb7, #1a5b92)", // Gradient background
+            color: "#ffffff", // White text color for contrast
+            "border-bottom": "2px solid #1a5b92", // Darker border for header bottom
+            "text-align": "center", // Center-align header text
             padding: "12px 20px",
             "font-size": "14px",
+            "font-weight": "bold", // Bold font for header
+            "white-space": "nowrap",
+            "text-shadow": "1px 1px 2px rgba(0, 0, 0, 0.3)", // Subtle text shadow for depth
           },
           td: {
-            "text-align": "center",
-            padding: "14px 10px",
-            "font-size": "13px",
-            border: "1px solid #ddd",
-            "white-space": "nowrap",
+            "text-align": "center", // Center-align table cell text
+            padding: "14px 10px", // Padding for table cell data
+            "font-size": "13px", // Font size for table cell data
+            border: "1px solid #ddd", // Border between table cells
+            "white-space": "nowrap", // Prevent text wrapping
           },
         },
         server: {
