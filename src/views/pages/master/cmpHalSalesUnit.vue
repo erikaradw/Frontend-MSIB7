@@ -1,8 +1,8 @@
 <template>
   <!---------------------------- Modal -->
   <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
   />
 
   <div
@@ -293,6 +293,83 @@
       <!-- END Block Title -->
 
       <div class="block-content">
+        <div class="filter-container">
+          <!-- Button untuk membuka modal filter -->
+          <button
+            class="btn btn-sm btn-primary"
+            @click="showFilterModal = true"
+          >
+            <i class="fa fa-filter"></i> Filter Data
+          </button>
+
+          <!-- Modal Filter -->
+          <div
+            v-if="showFilterModal"
+            class="modal fade in"
+            style="display: block"
+          >
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4>Filter Data</h4>
+                  <button class="close" @click="showFilterModal = false">
+                    <span>&times;</span>
+                  </button>
+                </div>
+
+                <div class="modal-body">
+                  <!-- Filter Dist Code -->
+                  <div class="form-group">
+                    <label>Distributor</label>
+                    <select class="form-control" v-model="filters.dist_code">
+                      <option value="">Pilih Distributor</option>
+                      <option
+                        v-for="dist_code in dist_codes"
+                        :key="dist_code"
+                        :value="dist_code"
+                      >
+                        {{ dist_code }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Filter Tahun -->
+                  <div class="form-group">
+                    <label>Tahun</label>
+                    <select class="form-control" v-model="filters.tahun">
+                      <option value="">Pilih Tahun</option>
+                      <option v-for="year in years" :key="year" :value="year">
+                        {{ year }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Filter Bulan -->
+                  <div class="form-group">
+                    <label>Bulan</label>
+                    <select class="form-control" v-model="filters.bulan">
+                      <option value="">Pilih Bulan</option>
+                      <option
+                        v-for="(month, index) in months"
+                        :key="index"
+                        :value="month.value"
+                      >
+                        {{ month.label }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button class="btn btn-sm btn-danger" @click="applyFilters">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!------------------------>
         <!-- <pre>{{ csv }}</pre> -->
 
@@ -448,6 +525,17 @@
             <i class="fas fa-file-pdf"></i>Export PDF
           </button>
         </div> -->
+        <div class="selection-bar" :class="{ active: selectedRows.length > 0 }">
+          <div class="selection-count">{{ selectedRows.length }} selected</div>
+          <button
+            class="delete-button"
+            @click="deleteSelectedRows"
+            :disabled="selectedRows.length === 0"
+          >
+            <i class="fas fa-trash"></i>
+            Delete
+          </button>
+        </div>
 
         <div class="d-flex justify-content-end align-items-center pull-right">
           <div>
@@ -538,6 +626,33 @@ export default {
   },
   data() {
     return {
+      showFilterModal: false,
+      filters: {
+        dist_code: "",
+        tahun: "",
+        bulan: "",
+      },
+      dist_codes: ["TRS", "PVL", "PPG"],
+      months: [
+        { value: 1, label: "JANUARI" },
+        { value: 2, label: "FEBRUARI" },
+        { value: 3, label: "MARET" },
+        { value: 4, label: "APRIL" },
+        { value: 5, label: "MEI" },
+        { value: 6, label: "JUNI" },
+        { value: 7, label: "JULI" },
+        { value: 8, label: "AGUSTUS" },
+        { value: 9, label: "SEPTEMBER" },
+        { value: 10, label: "OKTOBER" },
+        { value: 11, label: "NOVEMBER" },
+        { value: 12, label: "DESEMBER" },
+      ],
+      years: this.generateYears(),
+
+      selectAll: false,
+      selectedRows: [],
+      indeterminate: false,
+      showSelectionBar: false,
       uploadedFiles: [], // Array untuk menyimpan daftar file yang di-upload
       selectedFiles: [], // Array untuk menyimpan ID file yang dipilih
 
@@ -643,6 +758,7 @@ export default {
         netSalesUnit: "netSalesUnit",
         custCode: "custCode",
       },
+      newlimit: 10,
     };
   },
   async mounted() {
@@ -653,6 +769,170 @@ export default {
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
   },
   methods: {
+    generateYears() {
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      for (let year = 2020; year <= currentYear; year++) {
+        years.push(year.toString());
+      }
+      return years;
+    },
+
+    async applyFilters() {
+      const config = {
+        data: {
+          dist_code: this.filters.dist_code,
+          tahun: this.filters.tahun,
+          bulan: this.filters.bulan,
+        },
+      };
+
+      console.log(this.filters);
+
+      const response = await axios.delete(
+        this.$root.apiHost + this.$root.prefixApi + "deletefiltersalesunit",
+        config
+      );
+      this.$root.stopLoading();
+      if (response.data.status) {
+        Swal.fire(
+          "Deleted!",
+          `All data has been deleted. ${response.data.deleted_rows} rows were deleted.`,
+          "success"
+        );
+        this.refreshTable();
+      } else {
+        Swal.fire(
+          "Error",
+          response.data.message || "Failed to delete all data",
+          "error"
+        );
+      }
+      // this.$emit("filter-changed", this.filters);
+      // this.showFilterModal = false;
+    },
+
+    toggleSelectAll(event) {
+      const isChecked = event.target.checked;
+      const allData = this.grid.config.server.data || []; // Semua data dari Grid.js
+
+      // Jika checkbox "Select All" dicentang
+      if (isChecked) {
+        this.selectedRows = allData.map((row) => row[0]); // Ambil semua ID data dari server
+      } else {
+        this.selectedRows = []; // Kosongkan selectedRows jika tidak dicentang
+      }
+
+      // Perbarui status checkbox pada setiap baris
+      const checkboxes = document.querySelectorAll(".select-row-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = isChecked;
+      });
+
+      // Perbarui status "Select All"
+      this.selectAll = isChecked;
+      this.indeterminate = false;
+
+      // Tampilkan atau sembunyikan selection bar
+      this.updateSelectionBar();
+    },
+
+    toggleRowSelection(event, rowId) {
+      const isChecked = event.target.checked;
+
+      // Tambahkan atau hapus ID baris dari array selectedRows
+      if (isChecked) {
+        if (!this.selectedRows.includes(rowId)) {
+          this.selectedRows.push(rowId);
+        }
+      } else {
+        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
+      }
+
+      // Perbarui status header checkbox
+      const allData = this.grid.config.server.data || [];
+      if (this.selectedRows.length === 0) {
+        this.selectAll = false;
+        this.indeterminate = false;
+      } else if (this.selectedRows.length === allData.length) {
+        this.selectAll = true;
+        this.indeterminate = false;
+      } else {
+        this.selectAll = false;
+        this.indeterminate = true;
+      }
+
+      // Perbarui selection bar
+      this.updateSelectionBar();
+    },
+    updateSelectionBar() {
+      this.showSelectionBar = this.selectedRows.length > 0;
+
+      // Perbarui elemen UI selection bar
+      this.$nextTick(() => {
+        const selectionCount = document.querySelector(".selection-count");
+        if (selectionCount) {
+          selectionCount.textContent = `${this.selectedRows.length} selected`;
+        }
+      });
+    },
+
+    deleteSelectedRows() {
+      console.log("=== Delete Selected Rows Debug Info ===");
+      console.log("Rows to delete:", this.selectedRows);
+
+      if (!this.selectedRows.length) {
+        console.log("No rows selected, aborting delete");
+        return;
+      }
+
+      if (!confirm("Are you sure you want to delete the selected rows?")) {
+        console.log("Delete cancelled by user");
+        return;
+      }
+
+      console.log("Original rows:", this.rows);
+      this.rows = this.rows.filter(
+        (row) => !this.selectedRows.includes(row.id)
+      );
+      console.log("Rows after deletion:", this.rows);
+
+      // Reset selection state
+      this.selectedRows = [];
+      this.selectAll = false;
+      this.indeterminate = false;
+      this.showSelectionBar = false;
+
+      console.log("Selection state reset");
+
+      const headerCheckbox = document.querySelector(".select-all-checkbox");
+      if (headerCheckbox) {
+        headerCheckbox.checked = false;
+        headerCheckbox.indeterminate = false;
+        console.log("Header checkbox reset");
+      }
+
+      const checkboxes = document.querySelectorAll(".select-row-checkbox");
+      console.log("Resetting individual checkboxes:", checkboxes.length);
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+
+      const selectionBar = document.querySelector(".selection-bar");
+      if (selectionBar) {
+        selectionBar.classList.remove("active");
+        console.log("Selection bar hidden");
+      }
+
+      console.log("Final state:", {
+        selectAll: this.selectAll,
+        selectedRows: this.selectedRows,
+        indeterminate: this.indeterminate,
+        showSelectionBar: this.showSelectionBar,
+      });
+      console.log("=== End Delete Selected Rows Debug Info ===");
+    },
+
     toggleCheck(event) {
       const icon = event.target;
       if (icon.classList.contains("fa-square-o")) {
@@ -704,6 +984,41 @@ export default {
     //       // mythis.flag_checkBulk = true;
     //     });
     // },
+    createPaginationControl(grid) {
+      const paginationWrapper = document.querySelector(".gridjs-pagination");
+      if (paginationWrapper) {
+        const rowsPerPageContainer = document.createElement("div");
+        rowsPerPageContainer.style.display = "inline-block";
+        rowsPerPageContainer.style.marginLeft = "10px";
+
+        const label = document.createElement("span");
+        label.textContent = "Rows per page: ";
+        label.style.marginRight = "5px";
+
+        const select = document.createElement("select");
+        select.style.padding = "5px";
+        select.style.border = "1px solid #ccc";
+        select.style.borderRadius = "4px";
+
+        const options = [10, 20, 50, 100]; // Pilihan jumlah rows per page
+        options.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+
+        select.addEventListener("change", async (event) => {
+          const newLimit = parseInt(event.target.value, 10);
+          this.newlimit = newLimit;
+          this.refreshTable();
+        });
+
+        rowsPerPageContainer.appendChild(label);
+        rowsPerPageContainer.appendChild(select);
+        paginationWrapper.appendChild(rowsPerPageContainer);
+      }
+    },
     saveTodoBulk() {
       console.log(this.csv);
       let mythis = this;
@@ -1337,7 +1652,7 @@ export default {
       this.grid.updateConfig({
         // language: idID,
         pagination: {
-          limit: mythis.$root.pagingTabel1,
+          limit: this.newlimit,
           server: {
             url: (prev, page, limit) =>
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
@@ -1351,26 +1666,56 @@ export default {
           },
         },
         columns: [
-          {
-            name: "",
-            formatter: () =>
-              html(
-                `<i class="fa fa-square-o checklist-icon" style="cursor: pointer;" @click="toggleCheck"></i>`
-              ),
-            width: "50px",
-          },
-          { name: "No", hidden: false },
-
-          // "No",
-          "Tahun",
-          "Bulan",
-          "distCode",
-          "chnlCode",
-          "cabangCode",
-          "brchName",
-          "itemCode",
-          "netSalesUnit",
-          "custCode",
+          //     {
+          //       name: h("input", {
+          //         type: "checkbox",
+          //         class: "select-all-checkbox",
+          //         style: `
+          //   position: relative;
+          //   width: 20px;
+          //   height: 20px;
+          //   background-color: #ffffff;
+          //   border: 2px solid #007bff;
+          //   border-radius: 5px;
+          //   cursor: pointer;
+          //   transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+          // `,
+          //         checked: this.selectAll,
+          //         indeterminate: this.indeterminate,
+          //         onChange: (e) => this.toggleSelectAll(e),
+          //       }),
+          //       formatter: (_, row) =>
+          //         h("input", {
+          //           type: "checkbox",
+          //           class: "select-row-checkbox",
+          //           value: row.cells[0].data,
+          //           style: `
+          //     position: relative;
+          //     width: 20px;
+          //     height: 20px;
+          //     background-color: #ffffff;
+          //     border: 2px solid #007bff;
+          //     border-radius: 5px;
+          //     cursor: pointer;
+          //     transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+          //   `,
+          //           checked: this.selectedRows.includes(row.cells[0].data),
+          //           onChange: (e) => this.toggleRowSelection(e, row.cells[0].data),
+          //         }),
+          //       sort: false,
+          //       width: "40px",
+          //     },
+          { name: "ID", hidden: true },
+          { name: "No", hidden: false, sort: true },
+          { name: "Tahun", sort: true },
+          { name: "Bulan", sort: true },
+          { name: "distCode", sort: true },
+          { name: "chnlCode", sort: true },
+          { name: "cabangCode", sort: true },
+          { name: "brchName", sort: true },
+          { name: "itemCode", sort: true },
+          { name: "netSalesUnit", sort: true },
+          { name: "custCode", sort: true },
 
           {
             name: "Action",
@@ -1381,7 +1726,7 @@ export default {
                     `
           <button data-id="${row.cells[0].data}" class="btn btn-sm btn-primary text-white" id="editData" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
           &nbsp;&nbsp;&nbsp;
-          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-o"></i></button>
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash"></i></button>
         `
                   )
                 : mythis.$root.accessRoles[mythis.access_page].update
@@ -1392,7 +1737,7 @@ export default {
                 : mythis.$root.accessRoles[mythis.access_page].delete
                 ? html(
                     `&nbsp;&nbsp;&nbsp;
-          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-o"></i></button>`
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash"></i></button>`
                   )
                 : ``,
           },
@@ -1400,28 +1745,33 @@ export default {
         style: {
           table: {
             border: "1px solid #ccc",
-            width: "auto",
-            "min-width": "100%",
+            width: "100%",
+            "table-layout": "auto",
           },
           th: {
-            background: "linear-gradient(135deg, #3a8fb7, #1a5b92)", // Gradient background
-            color: "#ffffff", // White text color for contrast
-            "border-bottom": "2px solid #1a5b92", // Darker border for header bottom
-            "text-align": "center", // Center-align header text
-            padding: "12px 20px",
-            "font-size": "14px",
-            "font-weight": "bold", // Bold font for header
-            "white-space": "nowrap",
-            "text-shadow": "1px 1px 2px rgba(0, 0, 0, 0.3)", // Subtle text shadow for depth
+            background: "linear-gradient(135deg, #3a8fb7, #1a5b92)",
+            color: "#ffffff",
+            padding: "8px 12px",
+            "font-size": "12px",
+            "text-align": "center",
+            "white-space": "normal", // Membungkus teks
+            "word-break": "break-word", // Memecah kata panjang
+            overflow: "hidden",
+            "text-overflow": "ellipsis",
+            "line-height": "1.5",
           },
           td: {
-            "text-align": "center", // Center-align table cell text
-            padding: "14px 10px", // Padding for table cell data
-            "font-size": "13px", // Font size for table cell data
-            border: "1px solid #ddd", // Border between table cells
-            "white-space": "nowrap", // Prevent text wrapping
+            "line-height": "1.5",
+            padding: "8px 12px",
+            "font-size": "12px",
+            "text-align": "center",
+            "white-space": "normal", // Membungkus teks
+            "word-break": "break-word", // Memecah kata panjang
+            overflow: "hidden",
+            "text-overflow": "ellipsis",
           },
         },
+
         server: {
           url: this.$root.apiHost + this.$root.prefixApi + "salesunit",
           then: (data) =>
@@ -1456,7 +1806,17 @@ export default {
       $(document).off("click", "#deleteData");
       mythis.jqueryDelEdit();
       this.status_table = true;
+      this.createPaginationControl(this.grid);
     },
+    // toggleRowSelection(event, rowId) {
+    //   if (event.target.checked) {
+    //     // Tambahkan ID ke array selectedRows
+    //     this.selectedRows.push(rowId);
+    //   } else {
+    //     // Hapus ID dari array selectedRows
+    //     this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
+    //   }
+    // },
     deleteTodo(id) {
       var mythis = this;
       Swal.fire({
@@ -1615,9 +1975,80 @@ export default {
 </script>
 
 <style scoped>
-.checklist-icon {
+.selection-bar {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.selection-bar.active {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Counter selection */
+.selection-count {
+  color: #4a5568;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selection-count::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #ebf4ff;
+  color: #4299e1;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.filter-container {
+  margin-bottom: 20px;
+}
+
+/* Delete button */
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
   cursor: pointer;
 }
+
+.delete-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .selection-bar {
+    bottom: 12px;
+    left: 16px;
+    right: 16px;
+    transform: translateY(100px);
+    width: auto;
+  }
+
+  .selection-bar.active {
+    transform: translateY(0);
+  }
+}
+
 .custom-file-upload {
   display: inline-block;
   padding: 6px 12px;

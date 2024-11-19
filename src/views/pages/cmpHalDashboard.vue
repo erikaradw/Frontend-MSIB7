@@ -114,6 +114,9 @@ export default defineComponent({
     };
 
     return {
+      brandChartSeries: [],
+      regionalChartSeries: [],
+      loading: true,
       summaryCards: [
         {
           title: "Total Sales",
@@ -467,6 +470,22 @@ export default defineComponent({
         },
       ],
     };
+  },
+  methods: {
+    async fetchChartData() {
+      this.loading = true; // Tampilkan loading
+      try {
+        const response = await axios.get("your-api-endpoint");
+        const { brandData, regionalData } = response.data;
+
+        this.brandChartSeries = brandData;
+        this.regionalChartSeries = regionalData;
+      } catch (error) {
+        console.error("Gagal memuat data:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });
 </script>

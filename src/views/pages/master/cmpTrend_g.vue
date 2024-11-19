@@ -548,8 +548,8 @@
         <br />
         <br />
         <br /> -->
-        <div class="button-container">
-          <!-- <download-excel
+        <!-- <div class="button-container"> -->
+        <!-- <download-excel
             class="button"
             :data="json_data"
             :fields="json_fields"
@@ -559,23 +559,23 @@
             :before-finish="finishDownload"
             type="xlsx"
           > -->
-          <button
+        <!-- <button
             class="btn btn-sm btn-info pull-left"
             @click="exportDetailToXLS()"
           >
             <i class="fas fa-file-excel"></i>Export Excel
-          </button>
-          <!-- </download-excel> -->
+          </button> -->
+        <!-- </download-excel> -->
 
-          <!-- <button
+        <!-- <button
             class="btn btn-sm btn-primary pull-right"
             @click="exportPdf()"
           >
             <i class="fas fa-file-pdf"></i>Export PDF
           </button> -->
-        </div>
+        <!-- </div> -->
 
-        <div class="dropdown-container col-sm-3">
+        <!-- <div class="dropdown-container col-sm-3">
           <label for="select-item" class="dropdown-label">YEAR PERIODE</label>
           <div class="dropdown-wrapper">
             <select
@@ -589,10 +589,8 @@
               </option>
             </select>
             <i class="fas fa-chevron-down dropdown-icon"></i>
-            <!-- Icon Chevron untuk dropdown -->
           </div>
-        </div>
-        <br />
+        </div> -->
 
         <!-- <button
             class="btn btn-sm btn-primary"
@@ -611,6 +609,40 @@
             <i class="fa fa-trash"></i> Delete All Data
           </button> -->
         <!-- </div> -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <!-- Dropdown Year Periode -->
+              <div class="dropdown-container col-sm-4">
+                <label for="select-item" class="dropdown-label"
+                  >YEAR PERIODE</label
+                >
+                <div class="dropdown-wrapper">
+                  <select
+                    v-model="selectedYearPeriode"
+                    class="dropdown-year"
+                    id="select-item"
+                    @change="onChangeYearPeriodeHandler"
+                  >
+                    <option
+                      v-for="year in dataYearPeriode"
+                      :key="year"
+                      :value="year"
+                    >
+                      {{ year }}
+                    </option>
+                  </select>
+                  <i class="dropdown-icon"></i>
+                </div>
+              </div>
+
+              <button class="btn btn-info" @click="exportDetailToXLS">
+                <i class="fas fa-file-excel"></i> Export Excel
+              </button>
+            </div>
+          </div>
+        </div>
+        <br />
 
         <!-- :disabled="todo.dist_code == ''" -->
         <!------------------------>
@@ -1030,6 +1062,7 @@ export default {
         NovemberStock: "NovemberStock",
         DesemberStock: "DesemberStock",
       },
+      newlimit: 10,
     };
   },
   async mounted() {
@@ -1048,6 +1081,42 @@ export default {
     // await this.getSelectData();
   },
   methods: {
+    createPaginationControl(grid) {
+      const paginationWrapper = document.querySelector(".gridjs-pagination");
+      if (paginationWrapper) {
+        const rowsPerPageContainer = document.createElement("div");
+        rowsPerPageContainer.style.display = "inline-block";
+        rowsPerPageContainer.style.marginLeft = "10px";
+
+        const label = document.createElement("span");
+        label.textContent = "Rows per page: ";
+        label.style.marginRight = "5px";
+
+        const select = document.createElement("select");
+        select.style.padding = "5px";
+        select.style.border = "1px solid #ccc";
+        select.style.borderRadius = "4px";
+
+        const options = [10, 20, 50, 100]; 
+        options.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+
+        // Event listener untuk mengubah jumlah rows per halaman
+        select.addEventListener("change", async (event) => {
+          const newLimit = parseInt(event.target.value, 10);
+          this.newlimit = newLimit;
+          this.refreshTable();
+        });
+
+        rowsPerPageContainer.appendChild(label);
+        rowsPerPageContainer.appendChild(select);
+        paginationWrapper.appendChild(rowsPerPageContainer);
+      }
+    },
     async filterTableByYear(year) {
       try {
         // Fetch the filtered data based on the selected year
@@ -1183,13 +1252,18 @@ export default {
       const urlGetTrend =
         this.$root.apiHost + this.$root.prefixApi + "tahunTrend";
       try {
+        this.dataYearPeriode = [
+          new Date().getFullYear(),
+          new Date().getFullYear() -1,
+          new Date().getFullYear() -2,
+        ];
         const response = await axios.get(urlGetTrend);
-        if (response.data.status && response.data.data) {
-          this.dataYearPeriode = response.data.data
-            .map((item) => item.tahun)
-            .filter((year) => year !== "Total");
-          // this.selectedYearPeriode = this.dataYearPeriode[0] || null;
-        }
+        // if (response.data.status && response.data.data) {
+        //   this.dataYearPeriode = response.data.data
+        //     .map((item) => item.tahun)
+        //     .filter((year) => year !== "Total");
+          
+        // }
       } catch (error) {
         console.error("Error fetching year data:", error);
       }
@@ -1950,7 +2024,7 @@ export default {
       this.grid.updateConfig({
         // language: idID,
         pagination: {
-          limit: mythis.$root.pagingTabel1,
+          limit: this.newlimit,
           server: {
             url: (prev, page, limit) =>
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
@@ -2300,6 +2374,7 @@ export default {
       $(document).off("click", "#deleteData");
       mythis.jqueryDelEdit();
       this.status_table = true;
+      this.createPaginationControl(this.grid);
     },
     deleteTodo(id) {
       var mythis = this;
@@ -2550,13 +2625,29 @@ export default {
 }
 
 .btn-info {
-  background-color: #17a2b8; /* Info button background color */
-  color: white; /* Text color */
+  background: linear-gradient(
+    135deg,
+    #3a8fb7,
+    #1a5b92
+  ); /* Warna gradien biru */
+  color: white; /* Teks putih untuk kontras */
+  border: none; /* Hapus border */
+  border-radius: 5px; /* Sudut agak membulat */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Efek transisi */
+  margin-left: 10px; /* Tambahkan sedikit jarak */
+  white-space: nowrap;
+  padding: 8px 12px;
+  font-size: 12px;
+  max-width: 130px; /* Membatasi lebar tombol */
 }
 
 .btn-info:hover {
-  background-color: #138496; /* Darker shade on hover */
-  transform: scale(1.05); /* Slightly enlarges button on hover */
+  background: linear-gradient(
+    135deg,
+    #1a5b92,
+    #3a8fb7
+  ); /* Gradien terbalik saat hover */
+  transform: scale(1.05); /* Membesarkan sedikit saat hover */
 }
 
 .btn-primary {
@@ -2589,12 +2680,21 @@ export default {
 .centered-button-wrapper button {
   margin: 0 10px; /* Jarak antar button */
 }
-/* Styling untuk container dropdown */
-.dropdown-container {
-  margin-bottom: 10px;
+.d-flex {
+  display: flex;
 }
 
-/* Styling untuk label */
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.dropdown-container {
+  max-width: 200px; /* Maksimal lebar dropdown */
+}
 .dropdown-label {
   font-weight: bold;
   font-size: 14px;
@@ -2602,25 +2702,16 @@ export default {
   color: #333;
 }
 
-/* Styling wrapper untuk membuat icon berada di dalam */
 .dropdown-wrapper {
   position: relative;
   display: inline-block;
   width: 100%;
 }
 
-/* Styling untuk dropdown */
 .dropdown-year {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-  color: #333;
-  appearance: none; /* Hapus tampilan default browser */
-  outline: none;
-  transition: border 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Styling saat hover dan fokus */

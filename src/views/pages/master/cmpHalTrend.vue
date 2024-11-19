@@ -138,70 +138,6 @@
       <div class="block-content">
         <!------------------------>
         <!-- Button trigger modal -->
-        <!-- <pre>{{ csv }}</pre> -->
-        <div v-if="csv != null">
-          <strong>{{ csv.length }}</strong> data<br />
-        </div>
-
-        <!-- <vue-csv-import v-model="csv" :fields="dataImportCsv">
-          <vue-csv-toggle-headers></vue-csv-toggle-headers>
-          <vue-csv-errors></vue-csv-errors>
-          <vue-csv-input></vue-csv-input>
-          <vue-csv-table-map
-            :auto-match="true"
-            :table-attributes="{
-              id: 'csv=table',
-              class: 'table table-bordered table-hover',
-            }"
-          ></vue-csv-table-map>
-        </vue-csv-import> -->
-
-        <!-- <br /> -->
-        <button
-          v-if="csv != null"
-          @click="saveTodoBulky()"
-          type="button"
-          class="btn btn-sm btn-primary pull-left"
-        >
-          SAVE DATA
-        </button>
-
-        <div class="button-container">
-          <download-excel
-            v-if="status_table"
-            class="button"
-            :data="json_data"
-            :fields="json_fields"
-            :worksheet="nama_sheetnya"
-            :name="nama_excelnya"
-            :before-generate="startDownload"
-            :before-finish="finishDownload"
-            type="xlsx"
-          >
-            <button
-              class="btn btn-sm btn-info pull-left"
-              @click="download_excel_xyz()"
-            >
-              <i class="fas fa-file-excel"></i>Export Excel
-            </button>
-          </download-excel>
-
-          <!-- <button
-            class="btn btn-sm btn-primary pull-right"
-            @click="exportPdf()"
-          >
-            <i class="fas fa-file-pdf"></i>Export PDF
-          </button> -->
-        </div>
-        <br />
-
-        <!-- <button
-          v-if="status_table && $root.accessRoles[access_page].create"
-          class="btn btn-sm btn-success pull-right"
-          @click="show_modal()"
-        >
-          ADD DATA
-        </button> -->
 
         <div class="row row-cols-2">
           <div class="col-md-12">
@@ -352,7 +288,6 @@
             </div>
           </div>
         </div>
-        <br /><br /><br />
 
         <div class="centered-button-wrapper">
           <button
@@ -361,6 +296,33 @@
           >
             SHOW DATA
           </button>
+          <div class="button-container">
+            <download-excel
+              v-if="status_table"
+              class="button"
+              :data="json_data"
+              :fields="json_fields"
+              :worksheet="nama_sheetnya"
+              :name="nama_excelnya"
+              :before-generate="startDownload"
+              :before-finish="finishDownload"
+              type="xlsx"
+            >
+              <button
+                class="btn btn-sm btn-info pull-left"
+                @click="download_excel_xyz()"
+              >
+                <i class="fas fa-file-excel"></i>Export Excel
+              </button>
+            </download-excel>
+          </div>
+
+            <!-- <button
+            class="btn btn-sm btn-primary pull-right"
+            @click="exportPdf()"
+          >
+            <i class="fas fa-file-pdf"></i>Export PDF
+          </button> -->
           <!-- <button
             class="btn btn-sm btn-primary"
             data-toggle="tooltip"
@@ -777,6 +739,7 @@ export default {
         ServiceLevel: "ServiceLevel",
         PIC: "PIC",
       },
+      newlimit: 10,
     };
   },
   async mounted() {
@@ -795,6 +758,42 @@ export default {
     // await this.getSelectData();
   },
   methods: {
+    createPaginationControl(grid) {
+      const paginationWrapper = document.querySelector(".gridjs-pagination");
+      if (paginationWrapper) {
+        const rowsPerPageContainer = document.createElement("div");
+        rowsPerPageContainer.style.display = "inline-block";
+        rowsPerPageContainer.style.marginLeft = "10px";
+
+        const label = document.createElement("span");
+        label.textContent = "Rows per page: ";
+        label.style.marginRight = "5px";
+
+        const select = document.createElement("select");
+        select.style.padding = "5px";
+        select.style.border = "1px solid #ccc";
+        select.style.borderRadius = "4px";
+
+        const options = [10, 20, 50, 100]; 
+        options.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+
+        // Event listener untuk mengubah jumlah rows per halaman
+        select.addEventListener("change", async (event) => {
+          const newLimit = parseInt(event.target.value, 10);
+          this.newlimit = newLimit;
+          this.refreshTable();
+        });
+
+        rowsPerPageContainer.appendChild(label);
+        rowsPerPageContainer.appendChild(select);
+        paginationWrapper.appendChild(rowsPerPageContainer);
+      }
+    },
     updateOrderedMonths() {
       const startIndex = this.bulanOptions.indexOf(this.selectedMonth);
       this.orderedMonths = [
@@ -955,10 +954,10 @@ export default {
         const uniqueYearPeriodes = [];
         this.dataYearPeriode = [
           // { tahun: "All" }, // Add default "All" option
-          {tahun: new Date().getFullYear()},
-          {tahun: new Date().getFullYear() - 1},
-          {tahun: new Date().getFullYear() - 2},
-          {tahun: new Date().getFullYear() - 3},
+          { tahun: new Date().getFullYear() },
+          { tahun: new Date().getFullYear() - 1 },
+          { tahun: new Date().getFullYear() - 2 },
+          { tahun: new Date().getFullYear() - 3 },
           // {tahun: new Date().getFullYear() + 1},
           // {tahun: new Date().getFullYear() + 2},
           // ...channelData.data.filter((item) => {
@@ -1604,7 +1603,7 @@ export default {
       this.grid.updateConfig({
         // language: idID,
         pagination: {
-          limit: mythis.$root.pagingTabel1,
+          limit: this.newlimit,
           server: {
             url: (prev, page, limit) =>
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
@@ -1672,7 +1671,7 @@ export default {
           "BRAND",
           "KATEGORI",
           "STATUS PRODUCT",
-          "YOP",
+          // "YOP",
           "MONTH 1",
           "MONTH 2",
           "MONTH 3",
@@ -1770,7 +1769,7 @@ export default {
               html(`<span class="pull-left">${card.brand_name}</span>`),
               html(`<span class="pull-left">${card.kategori}</span>`),
               html(`<span class="pull-left">${card.status_product}</span>`),
-              html(`<span class="pull-left">${card.tahun}</span>`),
+              // html(`<span class="pull-left">${card.tahun}</span>`),
               html(
                 `<span class="pull-left">${mythis.formatNumber(
                   card.month_1
@@ -1921,6 +1920,7 @@ export default {
       $(document).off("click", "#deleteData");
       mythis.jqueryDelEdit();
       this.status_table = true;
+      this.createPaginationControl(this.grid);
     },
     deleteTodo(id) {
       var mythis = this;
@@ -2215,13 +2215,24 @@ export default {
 }
 
 .btn-info {
-  background-color: #17a2b8; /* Info button background color */
-  color: white; /* Text color */
+  background: linear-gradient(
+    135deg,
+    #3a8fb7,
+    #1a5b92
+  ); /* Warna gradien biru */
+  color: white; /* Teks putih untuk kontras */
+  border: none; /* Hapus border */
+  border-radius: 5px; /* Sudut agak membulat */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Efek transisi */
 }
 
 .btn-info:hover {
-  background-color: #138496; /* Darker shade on hover */
-  transform: scale(1.05); /* Slightly enlarges button on hover */
+  background: linear-gradient(
+    135deg,
+    #1a5b92,
+    #3a8fb7
+  ); /* Gradien terbalik saat hover */
+  transform: scale(1.05); /* Membesarkan sedikit saat hover */
 }
 
 .btn-primary {

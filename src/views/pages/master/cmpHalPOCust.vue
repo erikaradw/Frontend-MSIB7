@@ -1,5 +1,10 @@
 <template>
   <!---------------------------- Modal -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    rel="stylesheet"
+  />
+
   <div
     :class="modal ? 'modal fade in' : 'modal fade'"
     id="exampleModalCenter"
@@ -237,6 +242,82 @@
       <!-- END Block Title -->
 
       <div class="block-content">
+        <div class="filter-container">
+          <!-- Button untuk membuka modal filter -->
+          <button
+            class="btn btn-sm btn-primary"
+            @click="showFilterModal = true"
+          >
+            <i class="fa fa-filter"></i> Filter Data
+          </button>
+
+          <!-- Modal Filter -->
+          <div
+            v-if="showFilterModal"
+            class="modal fade in"
+            style="display: block"
+          >
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4>Filter Data</h4>
+                  <button class="close" @click="showFilterModal = false">
+                    <span>&times;</span>
+                  </button>
+                </div>
+
+                <div class="modal-body">
+                  <!-- Filter Dist Code -->
+                  <div class="form-group">
+                    <label>Distributor</label>
+                    <select class="form-control" v-model="filters.dist_code">
+                      <option value="">Pilih Distributor</option>
+                      <option
+                        v-for="dist_code in dist_codes"
+                        :key="dist_code"
+                        :value="dist_code"
+                      >
+                        {{ dist_code }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Filter Tahun -->
+                  <div class="form-group">
+                    <label>Tahun</label>
+                    <select class="form-control" v-model="filters.tahun">
+                      <option value="">Pilih Tahun</option>
+                      <option v-for="year in years" :key="year" :value="year">
+                        {{ year }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Filter Bulan -->
+                  <div class="form-group">
+                    <label>Bulan</label>
+                    <select class="form-control" v-model="filters.bulan">
+                      <option value="">Pilih Bulan</option>
+                      <option
+                        v-for="(month, index) in months"
+                        :key="index"
+                        :value="month.value"
+                      >
+                        {{ month.label }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button class="btn btn-sm btn-danger" @click="applyFilters">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <!------------------------>
         <!-- <pre>{{ csv }}</pre> -->
 
@@ -342,6 +423,13 @@
             <i class="fas fa-file-pdf"></i>Export PDF
           </button>
         </div> -->
+        <div class="selection-bar" :class="{ active: selectedRows.length > 0 }">
+          <div class="selection-count">{{ selectedRows.length }} selected</div>
+          <button class="delete-button" @click="deleteSelectedRows">
+            <i class="fas fa-trash"></i>
+            Delete
+          </button>
+        </div>
 
         <div class="d-flex justify-content-end align-items-center pull-right">
           <div>
@@ -388,6 +476,7 @@
         <div id="box"></div>
       </div>
       <!-- Block Content -->
+
       <!-- END Block Content -->
     </div>
     <!-- END Block -->
@@ -420,6 +509,31 @@ export default {
   },
   data() {
     return {
+      showFilterModal: false,
+      filters: {
+        dist_code: "",
+        tahun: "",
+        bulan: "",
+      },
+      dist_codes: ["TRS", "PVL", "PPG"],
+      months: [
+        { value: 1, label: "JANUARI" },
+        { value: 2, label: "FEBRUARI" },
+        { value: 3, label: "MARET" },
+        { value: 4, label: "APRIL" },
+        { value: 5, label: "MEI" },
+        { value: 6, label: "JUNI" },
+        { value: 7, label: "JULI" },
+        { value: 8, label: "AGUSTUS" },
+        { value: 9, label: "SEPTEMBER" },
+        { value: 10, label: "OKTOBER" },
+        { value: 11, label: "NOVEMBER" },
+        { value: 12, label: "DESEMBER" },
+      ],
+      years: this.generateYears(),
+
+      selectedRows: [],
+      selectAll: false,
       isUploaded: false,
       access_page: this.$root.decryptData(localStorage.getItem("halaman")),
       isLogin: localStorage.getItem("token") != null ? 1 : 0,
@@ -494,13 +608,14 @@ export default {
         ],
       ],
       json_fields: {
-        DIstCode: "DIstCode",
+        DistCode: "DistCode",
         TglOrder: "TglOrder",
         MTGCode: "MTGCode",
         QtyScReg: "QtyScReg",
         QtyPo: "QtyPo",
         BranchCode: "BranchCode",
       },
+      newlimit: 10,
     };
   },
   async mounted() {
@@ -509,6 +624,131 @@ export default {
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
   },
   methods: {
+    generateYears() {
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      for (let year = 2020; year <= currentYear; year++) {
+        years.push(year.toString());
+      }
+      return years;
+    },
+
+    async applyFilters() {
+      const config = {
+        data: {
+          dist_code: this.filters.dist_code,
+          tahun: this.filters.tahun,
+          bulan: this.filters.bulan,
+        },
+      };
+
+      console.log(this.filters);
+
+      const response = await axios.delete(
+        this.$root.apiHost + this.$root.prefixApi + "deletefilterpocust",
+        config
+      );
+      this.$root.stopLoading();
+      if (response.data.status) {
+        Swal.fire(
+          "Deleted!",
+          `All data has been deleted. ${response.data.deleted_rows} rows were deleted.`,
+          "success"
+        );
+        this.refreshTable();
+      } else {
+        Swal.fire(
+          "Error",
+          response.data.message || "Failed to delete all data",
+          "error"
+        );
+      }
+    },
+    toggleSelectAll(event) {
+      this.selectAll = event.target.checked; // Update the state of the header checkbox
+      if (this.selectAll) {
+        // Select all visible rows
+        const visibleRows = this.grid.config.server.data || []; // Adjust for server data
+        this.selectedRows = visibleRows.map((row) => row[0]); // Extract IDs from rows
+      } else {
+        // Deselect all rows
+        this.selectedRows = [];
+      }
+
+      const checkboxes = document.querySelectorAll(".select-row-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = this.selectAll;
+      });
+    },
+
+    toggleRowSelection(event, rowId) {
+      if (event.target.checked) {
+        // Add the row ID to the selectedRows array
+        if (!this.selectedRows.includes(rowId)) {
+          this.selectedRows.push(rowId);
+        }
+      } else {
+        // Remove the row ID from the selectedRows array
+        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
+        this.selectAll = false; // Uncheck the "select all" checkbox
+      }
+
+      // Update the "select all" checkbox state
+      const headerCheckbox = document.querySelector(".select-all-checkbox");
+      headerCheckbox.checked =
+        this.selectedRows.length === this.grid.config.server.data.length;
+      headerCheckbox.indeterminate =
+        this.selectedRows.length > 0 &&
+        this.selectedRows.length < this.grid.config.server.data.length;
+    },
+    deleteSelectedRows() {
+      if (!confirm("Are you sure you want to delete the selected rows?")) {
+        return;
+      }
+      this.rows = this.rows.filter(
+        (row) => !this.selectedRows.includes(row.id)
+      );
+
+      this.selectedRows = [];
+    },
+
+    createPaginationControl(grid) {
+      const paginationWrapper = document.querySelector(".gridjs-pagination");
+      if (paginationWrapper) {
+        const rowsPerPageContainer = document.createElement("div");
+        rowsPerPageContainer.style.display = "inline-block";
+        rowsPerPageContainer.style.marginLeft = "10px";
+
+        const label = document.createElement("span");
+        label.textContent = "Rows per page: ";
+        label.style.marginRight = "5px";
+
+        const select = document.createElement("select");
+        select.style.padding = "5px";
+        select.style.border = "1px solid #ccc";
+        select.style.borderRadius = "4px";
+
+        const options = [10, 20, 50, 100];
+        options.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+
+        // Event listener untuk mengubah jumlah rows per halaman
+        select.addEventListener("change", async (event) => {
+          const newLimit = parseInt(event.target.value, 10);
+          this.newlimit = newLimit;
+          this.refreshTable();
+        });
+
+        rowsPerPageContainer.appendChild(label);
+        rowsPerPageContainer.appendChild(select);
+        paginationWrapper.appendChild(rowsPerPageContainer);
+      }
+    },
+
     saveTodoBulk() {
       console.log(this.csv);
       let mythis = this;
@@ -1111,7 +1351,8 @@ export default {
       this.grid.updateConfig({
         // language: idID,
         pagination: {
-          limit: mythis.$root.pagingTabel1,
+          // limit: mythis.$root.pagingTabel1,
+          limit: this.newlimit,
           server: {
             url: (prev, page, limit) =>
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
@@ -1125,14 +1366,51 @@ export default {
           },
         },
         columns: [
+          //       {
+          //         name: h("input", {
+          //           type: "checkbox",
+          //           class: "select-all-checkbox",
+          //           style: `
+          //   position: relative;
+          //   width: 20px;
+          //   height: 20px;
+          //   background-color: #ffffff;
+          //   border: 2px solid #007bff;
+          //   border-radius: 5px;
+          //   cursor: pointer;
+          //   transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+          // `,
+          //           onChange: (e) => this.toggleSelectAll(e),
+          //         }),
+          //         formatter: (_, row) =>
+          //           h("input", {
+          //             type: "checkbox",
+          //             class: "select-row-checkbox",
+          //             value: row.cells[0].data,
+          //             style: `
+          //     position: relative;
+          //     width: 20px;
+          //     height: 20px;
+          //     background-color: #ffffff;
+          //     border: 2px solid #007bff;
+          //     border-radius: 5px;
+          //     cursor: pointer;
+          //     transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+          //   `,
+          //             checked: this.selectedRows.includes(row.cells[0].data),
+          //             onChange: (e) => this.toggleRowSelection(e, row.cells[0].data),
+          //           }),
+          //         sort: false,
+          //         width: "40px",
+          //       },
           { name: "ID", hidden: true },
-          "No",
-          "Cust Group",
-          "Tgl Order",
-          "MTG Code",
-          "Qty SC Reg",
-          "Qty PO",
-          "Cust Code",
+          { name: "No", sort: true },
+          { name: "Cust Group", sort: true },
+          { name: "Tgl Order", sort: true },
+          { name: "MTG Code", sort: true },
+          { name: "Qty SC Reg", sort: true },
+          { name: "Qty PO", sort: true },
+          { name: "Cust Code", sort: true },
 
           {
             name: "Action",
@@ -1143,7 +1421,7 @@ export default {
                     `
           <button data-id="${row.cells[0].data}" class="btn btn-sm btn-primary text-white" id="editData" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
           &nbsp;&nbsp;&nbsp;
-          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-o"></i></button>
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash"></i></button>
         `
                   )
                 : mythis.$root.accessRoles[mythis.access_page].update
@@ -1154,7 +1432,7 @@ export default {
                 : mythis.$root.accessRoles[mythis.access_page].delete
                 ? html(
                     `&nbsp;&nbsp;&nbsp;
-          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-o"></i></button>`
+          <button data-id="${row.cells[0].data}" class="btn btn-sm btn-info text-white" id="deleteData" data-toggle="tooltip" title="Delete"><i class="fa fa-trash"></i></button>`
                   )
                 : ``,
           },
@@ -1168,18 +1446,18 @@ export default {
           th: {
             background: "linear-gradient(135deg, #3a8fb7, #1a5b92)", // Gradient background
             color: "#ffffff", // White text color for contrast
-            "border-bottom": "2px solid #1a5b92", // Darker border for header bottom
+            "border-bottom": "1px solid #1a5b92", // Thinner border for header bottom
             "text-align": "center", // Center-align header text
-            padding: "12px 20px",
-            "font-size": "14px",
+            padding: "8px 12px", // Reduced padding for smaller size
+            "font-size": "13px", // Smaller font size for header
             "font-weight": "bold", // Bold font for header
             "white-space": "nowrap",
-            "text-shadow": "1px 1px 2px rgba(0, 0, 0, 0.3)", // Subtle text shadow for depth
+            "text-shadow": "1px 1px 1px rgba(0, 0, 0, 0.2)", // Subtle text shadow for depth
           },
           td: {
             "text-align": "center", // Center-align table cell text
-            padding: "14px 10px", // Padding for table cell data
-            "font-size": "13px", // Font size for table cell data
+            padding: "10px 8px", // Reduced padding for table cell data
+            "font-size": "13px", // Smaller font size for table cell data
             border: "1px solid #ddd", // Border between table cells
             "white-space": "nowrap", // Prevent text wrapping
           },
@@ -1215,6 +1493,14 @@ export default {
       $(document).off("click", "#deleteData");
       mythis.jqueryDelEdit();
       this.status_table = true;
+      this.createPaginationControl(this.grid);
+    },
+    toggleRowSelection(event, rowId) {
+      if (event.target.checked) {
+        this.selectedRows.push(rowId);
+      } else {
+        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
+      }
     },
     deleteTodo(id) {
       var mythis = this;
@@ -1366,6 +1652,88 @@ export default {
 </script>
 
 <style scoped>
+.selection-bar {
+  position: fixed;
+  bottom: 16px; /* Memberikan jarak dari bottom */
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  border: 1px solid #edf2f7;
+}
+
+/* Ketika aktif */
+.selection-bar.active {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Counter selection */
+.selection-count {
+  color: #4a5568;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selection-count::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #ebf4ff;
+  color: #4299e1;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* Delete button */
+.delete-button {
+  background: #fff;
+  color: #e53e3e;
+  border: 1px solid #fed7d7;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #fff5f5;
+}
+
+.delete-button i {
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .selection-bar {
+    bottom: 12px;
+    left: 16px;
+    right: 16px;
+    transform: translateY(100px);
+    width: auto;
+  }
+
+  .selection-bar.active {
+    transform: translateY(0);
+  }
+}
+
 .custom-file-upload {
   display: inline-block;
   padding: 6px 12px;
