@@ -45,7 +45,7 @@
                         ? 'form-control input-lg input-error'
                         : 'form-control input-lg'
                     "
-                    :disabled="!flagButtonAdd"
+                    
                     @input="
                       (val) => (todo.brand_code = todo.brand_code.toUpperCase())
                     "
@@ -571,6 +571,7 @@ export default {
         price: "price",
         statusProduct: "statusProduct",
       },
+      newlimit: 10,
     };
   },
   async mounted() {
@@ -579,6 +580,41 @@ export default {
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
   },
   methods: {
+    createPaginationControl(grid) {
+      const paginationWrapper = document.querySelector(".gridjs-pagination");
+      if (paginationWrapper) {
+        const rowsPerPageContainer = document.createElement("div");
+        rowsPerPageContainer.style.display = "inline-block";
+        rowsPerPageContainer.style.marginLeft = "10px";
+
+        const label = document.createElement("span");
+        label.textContent = "Rows per page: ";
+        label.style.marginRight = "5px";
+
+        const select = document.createElement("select");
+        select.style.padding = "5px";
+        select.style.border = "1px solid #ccc";
+        select.style.borderRadius = "4px";
+
+        const options = [10, 20, 50, 100]; // Pilihan jumlah rows per page
+        options.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+
+        select.addEventListener("change", async (event) => {
+          const newLimit = parseInt(event.target.value, 10);
+          this.newlimit = newLimit;
+          this.refreshTable();
+        });
+
+        rowsPerPageContainer.appendChild(label);
+        rowsPerPageContainer.appendChild(select);
+        paginationWrapper.appendChild(rowsPerPageContainer);
+      }
+    },
     saveTodoBulk() {
       console.log(this.csv);
       let mythis = this;
@@ -1276,7 +1312,8 @@ export default {
       this.grid.updateConfig({
         // language: idID,
         pagination: {
-          limit: mythis.$root.pagingTable1,
+          limit: this.newlimit,
+          // limit: mythis.$root.pagingTable1,
           server: {
             url: (prev, page, limit) =>
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
@@ -1386,6 +1423,7 @@ export default {
       $(document).off("click", "#deleteData");
       mythis.jqueryDelEdit();
       this.status_table = true;
+      this.createPaginationControl(this.grid);
     },
     deleteTodo(id) {
       var mythis = this;
@@ -1460,7 +1498,7 @@ export default {
             parent_code: mythis.todo.parent_code,
             price_code: mythis.todo.price_code,
             price: mythis.todo.price,
-            price: mythis.todo.status_product,
+            status_product: mythis.todo.status_product,
           },
           config
         )
