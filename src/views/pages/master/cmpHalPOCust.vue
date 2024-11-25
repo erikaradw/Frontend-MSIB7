@@ -310,14 +310,18 @@
                 </div>
 
                 <div class="modal-footer">
-                  <button class="btn btn-sm btn-danger" @click="applyFilters">
-                    Delete
+                  <button class="btn btn-sm btn-primary" @click="searchData">
+                    Search
                   </button>
+                  <!-- <button class="btn btn-sm btn-danger" @click="applyFilters">
+                    Delete
+                  </button> -->
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <br>
         <!------------------------>
         <!-- <pre>{{ csv }}</pre> -->
 
@@ -431,25 +435,37 @@
           </button>
         </div>
 
-        <div class="d-flex justify-content-end align-items-center pull-right">
+        <div class="d-flex justify-content-end align-items-center">
           <div>
             <button
-              class="btn btn-sm btn-info"
+              @click="selectAllRows"
+              class="btn btn-primary pull-left mr-2"
+            >
+              Select All
+            </button>
+            <button
+              @click="unselectAllRows"
+              class="btn btn-secondary pull-left"
+            >
+              Unselect All
+            </button>
+
+            <button
+              class="btn btn-sm btn-danger pull-right"
+              data-toggle="tooltip"
+              title="Delete All Data"
+              @click="deleteAllData"
+            >
+              <i class="fa fa-trash"></i> Delete All Data
+            </button>
+            <button
+              class="btn btn-sm btn-info pull-right"
               data-toggle="tooltip"
               style="margin-right: 10px"
               title="Import CSV"
               @click="show_modalBulk()"
             >
               <i class="fa fa-upload"></i> Import CSV
-            </button>
-
-            <button
-              class="btn btn-sm btn-danger"
-              data-toggle="tooltip"
-              title="Delete All Data"
-              @click="deleteAllData"
-            >
-              <i class="fa fa-trash"></i> Delete All Data
             </button>
 
             <button
@@ -509,6 +525,7 @@ export default {
   },
   data() {
     return {
+      penampung: [],
       showFilterModal: false,
       filters: {
         dist_code: "",
@@ -624,6 +641,121 @@ export default {
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
   },
   methods: {
+    selectAllRows() {
+      console.log(this.penampung);
+      this.selectedRows = [];
+      if (this.selectedRows.length === this.penampung.length) {
+        this.selectedRows = [];
+      } else {
+        this.selectedRows = this.penampung.map((row) => row.id);
+      }
+      const checkboxes = document.querySelectorAll(".select-row-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = this.selectedRows; // Set checked state
+      });
+      // const ids = this.penampung.map((item) => item.id);
+      // this.selectedRows = ids; // Ambil ID semua baris
+      // console.log(this.selectedRows);
+    },
+    unselectAllRows() {
+      this.selectedRows = [];
+      console.log(this.selectedRows);
+      const checkboxes = document.querySelectorAll(".select-row-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = false; // Set checked state
+      });
+    },
+    toggleRowSelection(event, rowId) {
+      console.log(event);
+      if (event.target.checked) {
+        if (!this.selectedRows.includes(rowId)) {
+          this.selectedRows.push(rowId);
+        }
+      } else {
+        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
+      }
+      console.log(this.selectedRows);
+    },
+    async searchData() {
+      try {
+        console.log("filters:", this.filters);
+        const response = await axios.get(
+          this.$root.apiHost + this.$root.prefixApi + "fetchFilteredDataPOCust",
+          {
+            params: {
+              dist_code: this.filters.dist_code,
+              tahun: this.filters.tahun,
+              bulan: this.filters.bulan,
+            },
+          }
+        );
+        if (response.status === 200 && response.data.status) {
+          this.refreshTable();
+          Swal.fire(
+            "Success",
+            "Data has been filtered successfully",
+            "success"
+          );
+        } else {
+          Swal.fire(
+            "Error",
+            response.data.message || "Failed to fetch data",
+            "error"
+          );
+        }
+        this.showFilterModal = false;
+      } catch (error) {
+        console.error("Error fetching filtered data:", error);
+        Swal.fire("Error", "An error occurred while fetching data", "error");
+      }
+    },
+    async deleteSelectedRows() {
+      // Tampilkan penampung untuk debug
+      console.log("Rows to delete:", this.penampung);
+
+      // Konfirmasi penghapusan
+      if (!confirm("Are you sure you want to delete the selected rows?")) {
+        return;
+      }
+
+      // Dapatkan ID yang dipilih
+      const listHps = this.selectedRows;
+
+      // Periksa apakah ada data yang dipilih
+      if (listHps.length === 0) {
+        alert("No rows selected for deletion.");
+        return;
+      }
+
+      try {
+        // Lakukan penghapusan secara paralel
+        // await Promise.all(
+        //   listHps.map((idTarget) =>
+        axios
+          // .delete(`http://localhost:8002/si/stock/hapus-banyak-data/${idTarget}`)
+          .delete(`http://localhost:8002/si/po/hapus-banyak-data`, {
+            data: this.selectedRows,
+          })
+          .then((res) => {
+            console.log(res);
+            // console.log(`Row with ID ${idTarget} deleted successfully.`);
+          })
+          .catch((error) => {
+            console.error(`Failed to delete row with ID ${idTarget}:`, error);
+          });
+        //   )
+        // );
+
+        // Tampilkan pesan sukses
+        alert("Selected rows deleted successfully.");
+      } catch (error) {
+        console.error("An error occurred during deletion:", error);
+        alert("An error occurred while deleting some rows.");
+      }
+
+      // Refresh tabel setelah selesai
+      this.refreshTable();
+    },
     generateYears() {
       const currentYear = new Date().getFullYear();
       const years = [];
@@ -663,53 +795,6 @@ export default {
           "error"
         );
       }
-    },
-    toggleSelectAll(event) {
-      this.selectAll = event.target.checked; // Update the state of the header checkbox
-      if (this.selectAll) {
-        // Select all visible rows
-        const visibleRows = this.grid.config.server.data || []; // Adjust for server data
-        this.selectedRows = visibleRows.map((row) => row[0]); // Extract IDs from rows
-      } else {
-        // Deselect all rows
-        this.selectedRows = [];
-      }
-
-      const checkboxes = document.querySelectorAll(".select-row-checkbox");
-      checkboxes.forEach((checkbox) => {
-        checkbox.checked = this.selectAll;
-      });
-    },
-
-    toggleRowSelection(event, rowId) {
-      if (event.target.checked) {
-        // Add the row ID to the selectedRows array
-        if (!this.selectedRows.includes(rowId)) {
-          this.selectedRows.push(rowId);
-        }
-      } else {
-        // Remove the row ID from the selectedRows array
-        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
-        this.selectAll = false; // Uncheck the "select all" checkbox
-      }
-
-      // Update the "select all" checkbox state
-      const headerCheckbox = document.querySelector(".select-all-checkbox");
-      headerCheckbox.checked =
-        this.selectedRows.length === this.grid.config.server.data.length;
-      headerCheckbox.indeterminate =
-        this.selectedRows.length > 0 &&
-        this.selectedRows.length < this.grid.config.server.data.length;
-    },
-    deleteSelectedRows() {
-      if (!confirm("Are you sure you want to delete the selected rows?")) {
-        return;
-      }
-      this.rows = this.rows.filter(
-        (row) => !this.selectedRows.includes(row.id)
-      );
-
-      this.selectedRows = [];
     },
 
     createPaginationControl(grid) {
@@ -1171,7 +1256,7 @@ export default {
           const countries_x = {
             nomor: nomor_x,
 
-            DIstCode: " " + resData.results[key].dist_code,
+            DistCode: " " + resData.results[key].dist_code,
             TglOrder: resData.results[key].tgl_order,
             MTGCode: resData.results[key].mtg_code,
             QtyScReg: resData.results[key].qty_sc_reg,
@@ -1357,7 +1442,9 @@ export default {
             url: (prev, page, limit) =>
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
                 page * limit
-              }`,
+              }&tahun=${this.filters.tahun}&bulan=${
+                this.filters.bulan
+              }&dist_code=${this.filters.dist_code}`,
           },
         },
         search: {
@@ -1366,45 +1453,31 @@ export default {
           },
         },
         columns: [
-          //       {
-          //         name: h("input", {
-          //           type: "checkbox",
-          //           class: "select-all-checkbox",
-          //           style: `
-          //   position: relative;
-          //   width: 20px;
-          //   height: 20px;
-          //   background-color: #ffffff;
-          //   border: 2px solid #007bff;
-          //   border-radius: 5px;
-          //   cursor: pointer;
-          //   transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
-          // `,
-          //           onChange: (e) => this.toggleSelectAll(e),
-          //         }),
-          //         formatter: (_, row) =>
-          //           h("input", {
-          //             type: "checkbox",
-          //             class: "select-row-checkbox",
-          //             value: row.cells[0].data,
-          //             style: `
-          //     position: relative;
-          //     width: 20px;
-          //     height: 20px;
-          //     background-color: #ffffff;
-          //     border: 2px solid #007bff;
-          //     border-radius: 5px;
-          //     cursor: pointer;
-          //     transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
-          //   `,
-          //             checked: this.selectedRows.includes(row.cells[0].data),
-          //             onChange: (e) => this.toggleRowSelection(e, row.cells[0].data),
-          //           }),
-          //         sort: false,
-          //         width: "40px",
-          //       },
-          { name: "ID", hidden: true },
-          { name: "No", sort: true },
+        {
+            name: "#", // Ganti header menjadi pagar
+            formatter: (_, row) =>
+              h("input", {
+                type: "checkbox",
+                class: "select-row-checkbox",
+                style: `
+             position: relative;
+             width: 20px;
+             height: 20px;
+             background-color: #ffffff;
+             border: 2px solid #007bff;
+             border-radius: 5px;
+             cursor: pointer;
+             transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+           `,
+                value: row.cells[0].data,
+                checked: this.selectedRows.includes(row.cells[0].data),
+                onChange: (e) => this.toggleRowSelection(e, row.cells[0].data),
+              }),
+            sort: false,
+            width: "40px",
+          },
+          // { name: "ID", hidden: true },
+          { name: "No", hidden: false, sort: true },
           { name: "Cust Group", sort: true },
           { name: "Tgl Order", sort: true },
           { name: "MTG Code", sort: true },
@@ -1464,8 +1537,9 @@ export default {
         },
         server: {
           url: this.$root.apiHost + this.$root.prefixApi + "pocust",
-          then: (data) =>
-            data.results.map((card) => [
+          then: (data) => {
+            this.penampung = data.results;
+            return data.results.map((card) => [
               card.id,
               data.nomorBaris++ + 1,
               html(`<span class="pull-left">${card.dist_code}</span>`),
@@ -1474,7 +1548,8 @@ export default {
               html(`<span class="pull-left">${card.qty_sc_reg}</span>`),
               html(`<span class="pull-left">${card.qty_po}</span>`),
               html(`<span class="pull-left">${card.branch_code}</span>`),
-            ]),
+            ]);
+          },
           total: (data) => data.count,
           handle: (res) => {
             // no matching records found
@@ -1652,6 +1727,23 @@ export default {
 </script>
 
 <style scoped>
+.header-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.btn-secondary:hover {
+  opacity: 0.8;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 .selection-bar {
   position: fixed;
   bottom: 16px; /* Memberikan jarak dari bottom */
@@ -1696,23 +1788,17 @@ export default {
   font-size: 11px;
 }
 
-/* Delete button */
 .delete-button {
-  background: #fff;
-  color: #e53e3e;
-  border: 1px solid #fed7d7;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
 }
 
 .delete-button:hover {
-  background: #fff5f5;
+  background: #ff5252;
 }
 
 .delete-button i {
@@ -1733,7 +1819,6 @@ export default {
     transform: translateY(0);
   }
 }
-
 .custom-file-upload {
   display: inline-block;
   padding: 6px 12px;
@@ -1772,6 +1857,7 @@ export default {
 .btn-primary {
   background-color: #1a5b92; /* Biru tua sesuai dengan tema header tabel */
   color: white;
+  margin-right: 10px;
 }
 
 .btn-info {

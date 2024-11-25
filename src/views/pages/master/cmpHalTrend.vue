@@ -296,7 +296,10 @@
           >
             SHOW DATA
           </button>
-          <div class="button-container">
+          <button class="btn btn-info" v-if="status_table" @click="exportDetailToXLS">
+            <i class="fas fa-file-excel"></i> Export Excel
+          </button>
+          <!-- <div class="button-container">
             <download-excel
               v-if="status_table"
               class="button"
@@ -315,9 +318,9 @@
                 <i class="fas fa-file-excel"></i>Export Excel
               </button>
             </download-excel>
-          </div>
+          </div> -->
 
-            <!-- <button
+          <!-- <button
             class="btn btn-sm btn-primary pull-right"
             @click="exportPdf()"
           >
@@ -340,6 +343,106 @@
             <i class="fa fa-trash"></i> Delete All Data
           </button> -->
         </div>
+        <table class="table-trend2" hidden v-if="tableTrend.length > 0">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>DISTRIBUTOR</th>
+              <th>CHANNEL</th>
+              <th>REGION</th>
+              <th>AREA</th>
+              <th>CABANG CODE</th>
+              <th>NAMA CABANG</th>
+              <th>PARENT CODE</th>
+              <th>ITEM CODE</th>
+              <th>SKU</th>
+              <th>BRAND</th>
+              <th>KATEGORI</th>
+              <th>STATUS PRODUCT</th>
+              <!-- <th>YOP</th> -->
+              <th>MONTH 1</th>
+              <th>MONTH 2</th>
+              <th>MONTH 3</th>
+              <th>MONTH 4</th>
+              <th>MONTH 5</th>
+              <th>MONTH 6</th>
+              <th>MONTH 7</th>
+              <th>MONTH 8</th>
+              <th>MONTH 9</th>
+              <th>MONTH 10</th>
+              <th>MONTH 11</th>
+              <th>MONTH 12</th>
+              <th>YEARLY AVERAGE UNIT</th>
+              <th>YEARLY AVERAGE VALUE</th>
+              <th>AVERAGE 9 MONTH UNIT</th>
+              <th>AVERAGE 9 MONTH VALUE</th>
+              <th>AVERAGE 6 MONTH UNIT</th>
+              <th>AVERAGE 6 MONTH VALUE</th>
+              <th>AVERAGE 3 MONTH UNIT</th>
+              <th>AVERAGE 3 MONTH VALUE</th>
+              <th>AVERAGE SALES</th>
+              <th>PURCHASE SUGGESTION</th>
+              <th>PURCHASE VALUE</th>
+              <th>STOCK ON HAND UNIT</th>
+              <th>DOI 3-MONTH</th>
+              <th>STATUS TREND</th>
+              <th>DELTA</th>
+              <th>QTY PO</th>
+              <th>QTY SC REG</th>
+              <th>SERVICE LEVEL</th>
+              <th>PIC</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="(item, index) in tableTrend" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ item.dist_code }}</td>
+              <td>{{ item.chnl_code }}</td>
+              <td>{{ item.region_name }}</td>
+              <td>{{ item.area_name }}</td>
+              <td>{{ item.nama_cabang }}</td>
+              <td>{{ item.parent_code }}</td>
+              <td>{{ item.item_code }}</td>
+              <td>{{ item.item_name }}</td>
+              <td>{{ item.brand_name }}</td>
+              <td>{{ item.kategori }}</td>
+              <td>{{ item.status_product }}</td>
+              <td>{{ item.tahun }}</td>
+              <td>{{ item.month_1 }}</td>
+              <td>{{ item.month_2 }}</td>
+              <td>{{ item.month_3 }}</td>
+              <td>{{ item.month_4 }}</td>
+              <td>{{ item.month_5 }}</td>
+              <td>{{ item.month_6 }}</td>
+              <td>{{ item.month_7 }}</td>
+              <td>{{ item.month_8 }}</td>
+              <td>{{ item.month_9 }}</td>
+              <td>{{ item.month_10 }}</td>
+              <td>{{ item.month_11 }}</td>
+              <td>{{ item.month_12 }}</td>
+              <td>{{ item.yearly_average_unit }}</td>
+              <td>{{ item.yearly_average_value }}</td>
+              <td>{{ item.average_9_month_unit }}</td>
+              <td>{{ item.average_9_month_value }}</td>
+              <td>{{ item.average_6_month_unit }}</td>
+              <td>{{ item.average_6_month_value }}</td>
+              <td>{{ item.average_3_month_unit }}</td>
+              <td>{{ item.average_3_month_value }}</td>
+              <td>{{ item.average_sales }}</td>
+              <td>{{ item.purchase_suggestion }}</td>
+              <td>{{ item.purchase_value }}</td>
+              <td>{{ item.stock_on_hand_unit }}</td>
+              <td>{{ item.doi_3_month }}</td>
+              <td>{{ item.status_trend }}</td>
+              <td>{{ item.delta }}</td>
+              <td>{{ item.qty_po }}</td>
+              <td>{{ item.qty_sc_reg }}</td>
+              <td>{{ item.service_level }}</td>
+              <td>{{ item.pic }}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <!-- :disabled="todo.dist_code == ''" -->
         <!------------------------>
@@ -355,6 +458,7 @@
 
 <script>
 import axios from "axios";
+import * as XLSX from "xlsx";
 import { markRaw } from "vue";
 import { Grid, h, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
@@ -379,6 +483,7 @@ export default {
   },
   data() {
     return {
+      tableTrend: [],
       bulanOptions: [
         { value: 1, name: "Januari" },
         { value: 2, name: "Februari" },
@@ -755,9 +860,53 @@ export default {
     // await this.getStatusProductForm();
     // await this.fetchMonthlySalesData();
     await this.getAllDatas();
+    await this.getTrendTable();
     // await this.getSelectData();
   },
   methods: {
+    async getTrendTable() {
+      let offset = 0;
+      const limit = 100;
+      this.tableTrend = []; // Menyimpan semua data hasil looping
+
+      try {
+        while (offset < 1000) {
+          const response = await axios.get(
+            `http://178.1.7.230:8207/si/monthly-sales-data?limit=${limit}&offset=${offset}`
+          );
+          const results = response.data.results;
+
+          // Menggabungkan hasil dari setiap pemanggilan ke `this.tableTrend`
+          this.tableTrend = [...this.tableTrend, ...results];
+
+          // Tambahkan offset sebesar limit setiap kali iterasi
+          offset += limit;
+
+          // Check jika data hasil response kosong, maka hentikan proses
+          if (results.length === 0) break;
+        }
+
+        console.log("Total data fetched:", this.tableTrend.length);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+    exportDetailToXLS() {
+      try {
+        console.log(this.tableTrend);
+
+        const tables = document.querySelector(".table-trend2");
+        const wb = XLSX.utils.table_to_book(tables, {
+          sheet: "Sheet JS",
+          bookType: "xls",
+        });
+        XLSX.writeFile(wb, "TrendSales.xls");
+
+        // this.$root.loader = true;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
     createPaginationControl(grid) {
       const paginationWrapper = document.querySelector(".gridjs-pagination");
       if (paginationWrapper) {
@@ -774,7 +923,7 @@ export default {
         select.style.border = "1px solid #ccc";
         select.style.borderRadius = "4px";
 
-        const options = [10, 20, 50, 100]; 
+        const options = [10, 20, 50, 100];
         options.forEach((value) => {
           const option = document.createElement("option");
           option.value = value;

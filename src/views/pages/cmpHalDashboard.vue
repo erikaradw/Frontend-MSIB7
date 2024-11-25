@@ -1,4 +1,12 @@
 <template>
+  <div class="row">
+  <div class="col-md-12" style="background-color: white; padding-left: 50px;">
+    <div style="overflow-x: scroll; width: 100%; max-height: 70vh;">
+      <canvas id="branchChart"></canvas>
+    </div>
+  </div>
+</div>
+
   <div class="min-h-screen bg-white py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header -->
@@ -99,7 +107,8 @@
 <script>
 import { defineComponent } from "vue";
 import VueApexCharts from "vue3-apexcharts";
-
+import { Chart } from "chart.js/auto";
+import axios from "axios";
 export default defineComponent({
   name: "Dashboard",
   components: {
@@ -114,6 +123,7 @@ export default defineComponent({
     };
 
     return {
+      dataGrafik: [],
       brandChartSeries: [],
       regionalChartSeries: [],
       loading: true,
@@ -471,11 +481,128 @@ export default defineComponent({
       ],
     };
   },
+
+  mounted() {
+    this.fetchChartData();
+    this.getGrafik();
+  },
+
   methods: {
+    async getGrafik() {
+      const response = await axios.get("http://localhost:8002/si/grafikTrend");
+      this.dataGrafik = response.data.data;
+      this.renderChart();
+    },
+    renderChart() {
+      // Ambil elemen canvas
+      const canvas = document.getElementById("branchChart");
+      const ctx = canvas.getContext("2d");
+
+      // Hitung lebar dinamis berdasarkan jumlah data
+      const labels = this.dataGrafik.map((item) => item.nama_cabang);
+      const barWidth = 50; // Lebar setiap bar dalam px
+      const totalWidth = labels.length * barWidth; // Total lebar chart
+      canvas.style.width = `${totalWidth}px`; // Atur lebar canvas secara dinamis
+
+      // Data untuk setiap kategori
+      const yearlyData = this.dataGrafik.map((item) => item.total_yearly_average_unit);
+      const nineMonthData = this.dataGrafik.map((item) => item.total_9_month_average_unit);
+      const sixMonthData = this.dataGrafik.map((item) => item.total_6_month_average_unit);
+      const threeMonthData = this.dataGrafik.map((item) => item.total_3_month_average_unit);
+
+      // Tentukan nilai maksimum untuk skala Y (misal, nilai tertinggi + 10% sebagai batas atas)
+      const maxValue = Math.max(
+        ...yearlyData,
+        ...nineMonthData,
+        ...sixMonthData,
+        ...threeMonthData
+      );
+      const yAxisMax = Math.ceil(maxValue * 1.2); // Tambahkan margin 20% ke nilai maksimum
+
+      const data = {
+        labels: labels, // Cabang
+        datasets: [
+          {
+            label: "Yearly Average",
+            data: yearlyData,
+            backgroundColor: "rgba(54, 162, 235, 0.7)", // Biru
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1,
+          },
+          {
+            label: "Average 9 Months",
+            data: nineMonthData,
+            backgroundColor: "rgba(255, 206, 86, 0.7)", // Kuning
+            borderColor: "rgba(255, 206, 86, 1)",
+            borderWidth: 1,
+          },
+          {
+            label: "Average 6 Months",
+            data: sixMonthData,
+            backgroundColor: "rgba(75, 192, 192, 0.7)", // Hijau
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+          {
+            label: "Average 3 Months",
+            data: threeMonthData,
+            backgroundColor: "rgba(153, 102, 255, 0.7)", // Ungu
+            borderColor: "rgba(153, 102, 255, 1)",
+            borderWidth: 1,
+          },
+        ],
+      };
+
+      const config = {
+        type: "bar",
+        data: data,
+        options: {
+          responsive: false, // Matikan responsivitas agar width diatur manual
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            title: {
+              display: true,
+              text: "Average Unit by Branch",
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+            },
+            y: {
+              beginAtZero: true,
+              max: yAxisMax, // Set nilai maksimum skala Y
+            },
+          },
+        },
+      };
+
+      // Render Chart
+      new Chart(ctx, config);
+    },
+    async piechart() {
+      const data = {
+        labels: ["Red", "Blue", "Yellow"],
+        datasets: [
+          {
+            label: "My First Dataset",
+            data: [300, 50, 100],
+            backgroundColor: [
+              "rgb(255, 99, 132)",
+              "rgb(54, 162, 235)",
+              "rgb(255, 205, 86)",
+            ],
+            hoverOffset: 4,
+          },
+        ],
+      };
+    },
     async fetchChartData() {
       this.loading = true; // Tampilkan loading
       try {
-        const response = await axios.get("your-api-endpoint");
+        const response = await axios.get("monthly-sales-data");
         const { brandData, regionalData } = response.data;
 
         this.brandChartSeries = brandData;

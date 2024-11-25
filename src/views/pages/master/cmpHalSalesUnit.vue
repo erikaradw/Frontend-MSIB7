@@ -291,16 +291,13 @@
         <i v-if="!status_table" class="fa fa-spinner fa-spin text-default"></i>
       </div>
       <!-- END Block Title -->
+      <button class="btn btn-sm btn-primary" @click="showFilterModal = true">
+        <i class="fa fa-filter"></i> Filter Data
+      </button>
 
       <div class="block-content">
         <div class="filter-container">
           <!-- Button untuk membuka modal filter -->
-          <button
-            class="btn btn-sm btn-primary"
-            @click="showFilterModal = true"
-          >
-            <i class="fa fa-filter"></i> Filter Data
-          </button>
 
           <!-- Modal Filter -->
           <div
@@ -361,9 +358,12 @@
                 </div>
 
                 <div class="modal-footer">
-                  <button class="btn btn-sm btn-danger" @click="applyFilters">
-                    Delete
+                  <button class="btn btn-sm btn-primary" @click="searchData">
+                    Search
                   </button>
+                  <!-- <button class="btn btn-sm btn-danger" @click="applyFilters">
+                    Delete
+                  </button> -->
                 </div>
               </div>
             </div>
@@ -536,26 +536,39 @@
             Delete
           </button>
         </div>
-
-        <div class="d-flex justify-content-end align-items-center pull-right">
+        
+        <br />
+        <div class="d-flex justify-content-end align-items-center">
           <div>
             <button
-              class="btn btn-sm btn-info"
+              @click="selectAllRows"
+              class="btn btn-primary pull-left mr-2"
+            >
+              Select All
+            </button>
+            <button
+              @click="unselectAllRows"
+              class="btn btn-secondary pull-left"
+            >
+              Unselect All
+            </button>
+
+            <button
+              class="btn btn-sm btn-danger pull-right"
+              data-toggle="tooltip"
+              title="Delete All Data"
+              @click="deleteAllData"
+            >
+              <i class="fa fa-trash"></i> Delete All Data
+            </button>
+            <button
+              class="btn btn-sm btn-info pull-right"
               data-toggle="tooltip"
               style="margin-right: 10px"
               title="Import CSV"
               @click="show_modalBulk()"
             >
               <i class="fa fa-upload"></i> Import CSV
-            </button>
-
-            <button
-              class="btn btn-sm btn-danger"
-              data-toggle="tooltip"
-              title="Delete All Data"
-              @click="deleteAllData"
-            >
-              <i class="fa fa-trash"></i> Delete All Data
             </button>
 
             <button
@@ -626,6 +639,7 @@ export default {
   },
   data() {
     return {
+      penampung: [],
       showFilterModal: false,
       filters: {
         dist_code: "",
@@ -769,6 +783,74 @@ export default {
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
   },
   methods: {
+    selectAllRows() {
+      console.log(this.penampung);
+      this.selectedRows = [];
+      if (this.selectedRows.length === this.penampung.length) {
+        this.selectedRows = [];
+      } else {
+        this.selectedRows = this.penampung.map((row) => row.id);
+      }
+      const checkboxes = document.querySelectorAll(".select-row-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = this.selectedRows; // Set checked state
+      });
+      // const ids = this.penampung.map((item) => item.id);
+      // this.selectedRows = ids; // Ambil ID semua baris
+      // console.log(this.selectedRows);
+    },
+    unselectAllRows() {
+      this.selectedRows = [];
+      console.log(this.selectedRows);
+      const checkboxes = document.querySelectorAll(".select-row-checkbox");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = false; // Set checked state
+      });
+    },
+    toggleRowSelection(event, rowId) {
+      console.log(event);
+      if (event.target.checked) {
+        if (!this.selectedRows.includes(rowId)) {
+          this.selectedRows.push(rowId);
+        }
+      } else {
+        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
+      }
+      console.log(this.selectedRows);
+    },
+    async searchData() {
+      try {
+        console.log("filters:", this.filters);
+        const response = await axios.get(
+          this.$root.apiHost + this.$root.prefixApi + "fetchFilteredData",
+          {
+            params: {
+              dist_code: this.filters.dist_code,
+              tahun: this.filters.tahun,
+              bulan: this.filters.bulan,
+            },
+          }
+        );
+        if (response.status === 200 && response.data.status) {
+          this.refreshTable();
+          Swal.fire(
+            "Success",
+            "Data has been filtered successfully",
+            "success"
+          );
+        } else {
+          Swal.fire(
+            "Error",
+            response.data.message || "Failed to fetch data",
+            "error"
+          );
+        }
+        this.showFilterModal = false;
+      } catch (error) {
+        console.error("Error fetching filtered data:", error);
+        Swal.fire("Error", "An error occurred while fetching data", "error");
+      }
+    },
     generateYears() {
       const currentYear = new Date().getFullYear();
       const years = [];
@@ -811,128 +893,53 @@ export default {
       // this.$emit("filter-changed", this.filters);
       // this.showFilterModal = false;
     },
+    async deleteSelectedRows() {
+      // Tampilkan penampung untuk debug
+      console.log("Rows to delete:", this.penampung);
 
-    toggleSelectAll(event) {
-      const isChecked = event.target.checked;
-      const allData = this.grid.config.server.data || []; // Semua data dari Grid.js
-
-      // Jika checkbox "Select All" dicentang
-      if (isChecked) {
-        this.selectedRows = allData.map((row) => row[0]); // Ambil semua ID data dari server
-      } else {
-        this.selectedRows = []; // Kosongkan selectedRows jika tidak dicentang
-      }
-
-      // Perbarui status checkbox pada setiap baris
-      const checkboxes = document.querySelectorAll(".select-row-checkbox");
-      checkboxes.forEach((checkbox) => {
-        checkbox.checked = isChecked;
-      });
-
-      // Perbarui status "Select All"
-      this.selectAll = isChecked;
-      this.indeterminate = false;
-
-      // Tampilkan atau sembunyikan selection bar
-      this.updateSelectionBar();
-    },
-
-    toggleRowSelection(event, rowId) {
-      const isChecked = event.target.checked;
-
-      // Tambahkan atau hapus ID baris dari array selectedRows
-      if (isChecked) {
-        if (!this.selectedRows.includes(rowId)) {
-          this.selectedRows.push(rowId);
-        }
-      } else {
-        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
-      }
-
-      // Perbarui status header checkbox
-      const allData = this.grid.config.server.data || [];
-      if (this.selectedRows.length === 0) {
-        this.selectAll = false;
-        this.indeterminate = false;
-      } else if (this.selectedRows.length === allData.length) {
-        this.selectAll = true;
-        this.indeterminate = false;
-      } else {
-        this.selectAll = false;
-        this.indeterminate = true;
-      }
-
-      // Perbarui selection bar
-      this.updateSelectionBar();
-    },
-    updateSelectionBar() {
-      this.showSelectionBar = this.selectedRows.length > 0;
-
-      // Perbarui elemen UI selection bar
-      this.$nextTick(() => {
-        const selectionCount = document.querySelector(".selection-count");
-        if (selectionCount) {
-          selectionCount.textContent = `${this.selectedRows.length} selected`;
-        }
-      });
-    },
-
-    deleteSelectedRows() {
-      console.log("=== Delete Selected Rows Debug Info ===");
-      console.log("Rows to delete:", this.selectedRows);
-
-      if (!this.selectedRows.length) {
-        console.log("No rows selected, aborting delete");
-        return;
-      }
-
+      // Konfirmasi penghapusan
       if (!confirm("Are you sure you want to delete the selected rows?")) {
-        console.log("Delete cancelled by user");
         return;
       }
 
-      console.log("Original rows:", this.rows);
-      this.rows = this.rows.filter(
-        (row) => !this.selectedRows.includes(row.id)
-      );
-      console.log("Rows after deletion:", this.rows);
+      // Dapatkan ID yang dipilih
+      const listHps = this.selectedRows;
 
-      // Reset selection state
-      this.selectedRows = [];
-      this.selectAll = false;
-      this.indeterminate = false;
-      this.showSelectionBar = false;
-
-      console.log("Selection state reset");
-
-      const headerCheckbox = document.querySelector(".select-all-checkbox");
-      if (headerCheckbox) {
-        headerCheckbox.checked = false;
-        headerCheckbox.indeterminate = false;
-        console.log("Header checkbox reset");
+      // Periksa apakah ada data yang dipilih
+      if (listHps.length === 0) {
+        alert("No rows selected for deletion.");
+        return;
       }
 
-      const checkboxes = document.querySelectorAll(".select-row-checkbox");
-      console.log("Resetting individual checkboxes:", checkboxes.length);
-      checkboxes.forEach((checkbox) => {
-        checkbox.checked = false;
-      });
+      try {
+        // Lakukan penghapusan secara paralel
+        // await Promise.all(
+        //   listHps.map((idTarget) =>
+        axios
+          // .delete(`http://localhost:8002/si/stock/hapus-banyak-data/${idTarget}`)
+          .delete(`http://localhost:8002/si/salesunit/hapus-banyak-data`, {
+            data: this.selectedRows,
+          })
+          .then((res) => {
+            console.log(res);
+            // console.log(`Row with ID ${idTarget} deleted successfully.`);
+          })
+          .catch((error) => {
+            console.error(`Failed to delete row with ID ${idTarget}:`, error);
+          });
+        //   )
+        // );
 
-      const selectionBar = document.querySelector(".selection-bar");
-      if (selectionBar) {
-        selectionBar.classList.remove("active");
-        console.log("Selection bar hidden");
+        // Tampilkan pesan sukses
+        alert("Selected rows deleted successfully.");
+      } catch (error) {
+        console.error("An error occurred during deletion:", error);
+        alert("An error occurred while deleting some rows.");
       }
 
-      console.log("Final state:", {
-        selectAll: this.selectAll,
-        selectedRows: this.selectedRows,
-        indeterminate: this.indeterminate,
-        showSelectionBar: this.showSelectionBar,
-      });
-      console.log("=== End Delete Selected Rows Debug Info ===");
+      // Refresh tabel setelah selesai
+      this.refreshTable();
     },
-
     toggleCheck(event) {
       const icon = event.target;
       if (icon.classList.contains("fa-square-o")) {
@@ -1657,7 +1664,9 @@ export default {
             url: (prev, page, limit) =>
               `${prev}${prev.includes("?") ? "&" : "?"}limit=${limit}&offset=${
                 page * limit
-              }`,
+              }&tahun=${this.filters.tahun}&bulan=${
+                this.filters.bulan
+              }&dist_code=${this.filters.dist_code}`,
           },
         },
         search: {
@@ -1666,46 +1675,30 @@ export default {
           },
         },
         columns: [
-          //     {
-          //       name: h("input", {
-          //         type: "checkbox",
-          //         class: "select-all-checkbox",
-          //         style: `
-          //   position: relative;
-          //   width: 20px;
-          //   height: 20px;
-          //   background-color: #ffffff;
-          //   border: 2px solid #007bff;
-          //   border-radius: 5px;
-          //   cursor: pointer;
-          //   transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
-          // `,
-          //         checked: this.selectAll,
-          //         indeterminate: this.indeterminate,
-          //         onChange: (e) => this.toggleSelectAll(e),
-          //       }),
-          //       formatter: (_, row) =>
-          //         h("input", {
-          //           type: "checkbox",
-          //           class: "select-row-checkbox",
-          //           value: row.cells[0].data,
-          //           style: `
-          //     position: relative;
-          //     width: 20px;
-          //     height: 20px;
-          //     background-color: #ffffff;
-          //     border: 2px solid #007bff;
-          //     border-radius: 5px;
-          //     cursor: pointer;
-          //     transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
-          //   `,
-          //           checked: this.selectedRows.includes(row.cells[0].data),
-          //           onChange: (e) => this.toggleRowSelection(e, row.cells[0].data),
-          //         }),
-          //       sort: false,
-          //       width: "40px",
-          //     },
-          { name: "ID", hidden: true },
+          {
+            name: "#", // Ganti header menjadi pagar
+            formatter: (_, row) =>
+              h("input", {
+                type: "checkbox",
+                class: "select-row-checkbox",
+                style: `
+             position: relative;
+             width: 20px;
+             height: 20px;
+             background-color: #ffffff;
+             border: 2px solid #007bff;
+             border-radius: 5px;
+             cursor: pointer;
+             transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+           `,
+                value: row.cells[0].data,
+                checked: this.selectedRows.includes(row.cells[0].data),
+                onChange: (e) => this.toggleRowSelection(e, row.cells[0].data),
+              }),
+            sort: false,
+            width: "40px",
+          },
+          // { name: "ID", hidden: true },
           { name: "No", hidden: false, sort: true },
           { name: "Tahun", sort: true },
           { name: "Bulan", sort: true },
@@ -1774,8 +1767,9 @@ export default {
 
         server: {
           url: this.$root.apiHost + this.$root.prefixApi + "salesunit",
-          then: (data) =>
-            data.results.map((card) => [
+          then: (data) => {
+            this.penampung = data.results;
+            return data.results.map((card) => [
               card.id,
               data.nomorBaris++ + 1,
               html(`<span class="pull-left">${card.tahun}</span>`),
@@ -1787,7 +1781,8 @@ export default {
               html(`<span class="pull-left">${card.item_code}</span>`),
               html(`<span class="pull-left">${card.net_sales_unit}</span>`),
               html(`<span class="pull-left">${card.cust_code}</span>`),
-            ]),
+            ]);
+          },
           total: (data) => data.count,
           handle: (res) => {
             // no matching records found
@@ -1808,15 +1803,15 @@ export default {
       this.status_table = true;
       this.createPaginationControl(this.grid);
     },
-    // toggleRowSelection(event, rowId) {
-    //   if (event.target.checked) {
-    //     // Tambahkan ID ke array selectedRows
-    //     this.selectedRows.push(rowId);
-    //   } else {
-    //     // Hapus ID dari array selectedRows
-    //     this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
-    //   }
-    // },
+    toggleRowSelection(event, rowId) {
+      if (event.target.checked) {
+        // Tambahkan ID ke array selectedRows
+        this.selectedRows.push(rowId);
+      } else {
+        // Hapus ID dari array selectedRows
+        this.selectedRows = this.selectedRows.filter((id) => id !== rowId);
+      }
+    },
     deleteTodo(id) {
       var mythis = this;
       Swal.fire({
@@ -1975,23 +1970,43 @@ export default {
 </script>
 
 <style scoped>
-.selection-bar {
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+.header-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
 }
-
-.selection-bar.active {
+.btn-secondary:hover {
+  opacity: 0.8;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.selection-bar {
+  position: fixed;
+  bottom: 16px; /* Memberikan jarak dari bottom */
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: white;
   display: flex;
   align-items: center;
   gap: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  border: 1px solid #edf2f7;
+}
+
+/* Ketika aktif */
+.selection-bar.active {
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Counter selection */
@@ -2015,11 +2030,7 @@ export default {
   border-radius: 4px;
   font-size: 11px;
 }
-.filter-container {
-  margin-bottom: 20px;
-}
 
-/* Delete button */
 .delete-button {
   background-color: #dc3545;
   color: white;
@@ -2029,9 +2040,12 @@ export default {
   cursor: pointer;
 }
 
-.delete-button:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
+.delete-button:hover {
+  background: #ff5252;
+}
+
+.delete-button i {
+  font-size: 14px;
 }
 
 /* Responsive */
@@ -2048,7 +2062,6 @@ export default {
     transform: translateY(0);
   }
 }
-
 .custom-file-upload {
   display: inline-block;
   padding: 6px 12px;
@@ -2065,17 +2078,6 @@ export default {
   background-color: #c30404;
   transform: scale(1.05);
 }
-
-.modal-body {
-  overflow-x: auto;
-  margin-right: 10px;
-}
-
-table {
-  width: 100%;
-  min-width: 600px;
-}
-
 .input-error {
   border: red 1px solid;
 }
@@ -2098,6 +2100,7 @@ table {
 .btn-primary {
   background-color: #1a5b92; /* Biru tua sesuai dengan tema header tabel */
   color: white;
+  margin-right: 10px;
 }
 
 .btn-info {
@@ -2109,5 +2112,15 @@ table {
 .btn-info:hover {
   transform: scale(1.05); /* Efek sedikit membesar saat hover */
   opacity: 0.9; /* Menambahkan efek hover */
+}
+
+.modal-body {
+  overflow-x: auto;
+  margin-right: 10px;
+}
+
+table {
+  width: 100%;
+  min-width: 600px;
 }
 </style>
