@@ -358,7 +358,7 @@
                 </div>
 
                 <div class="modal-footer">
-                  <button class="btn btn-sm btn-primary" @click="searchData">
+                  <button class="btn btn-sm btn-primary" @click="refreshTable">
                     Search
                   </button>
                   <!-- <button class="btn btn-sm btn-danger" @click="applyFilters">
@@ -1187,6 +1187,7 @@ export default {
       var e = $('<div id="wrapper2"></div>');
       $("#box").append(e);
       this.getTable();
+      this.showFilterModal = false;
       //////////////////////////////
     },
     saveTodo() {
