@@ -296,9 +296,16 @@
           >
             SHOW DATA
           </button>
-          <button class="btn btn-info" v-if="status_table" @click="exportDetailToXLS">
+
+          <button
+            class="btn btn-info"
+            v-if="status_table"
+            @click="exportDetailToXLS"
+          >
             <i class="fas fa-file-excel"></i> Export Excel
-          </button>
+
+            </button>
+          
           <!-- <div class="button-container">
             <download-excel
               v-if="status_table"
@@ -351,8 +358,7 @@
               <th>CHANNEL</th>
               <th>REGION</th>
               <th>AREA</th>
-              <th>CABANG CODE</th>
-              <th>NAMA CABANG</th>
+              <th>CABANG</th>
               <th>PARENT CODE</th>
               <th>ITEM CODE</th>
               <th>SKU</th>
@@ -384,7 +390,7 @@
               <th>PURCHASE SUGGESTION</th>
               <th>PURCHASE VALUE</th>
               <th>STOCK ON HAND UNIT</th>
-              <th>DOI 3-MONTH</th>
+              <th>DOI 3 MONTH</th>
               <th>STATUS TREND</th>
               <th>DELTA</th>
               <th>QTY PO</th>
@@ -408,7 +414,7 @@
               <td>{{ item.brand_name }}</td>
               <td>{{ item.kategori }}</td>
               <td>{{ item.status_product }}</td>
-              <td>{{ item.tahun }}</td>
+              <!-- <td>{{ item.tahun }}</td> -->
               <td>{{ item.month_1 }}</td>
               <td>{{ item.month_2 }}</td>
               <td>{{ item.month_3 }}</td>
@@ -845,6 +851,8 @@ export default {
         PIC: "PIC",
       },
       newlimit: 10,
+
+      status_download :0,
     };
   },
   async mounted() {
@@ -852,27 +860,64 @@ export default {
     // await this.$root.refreshToken(localStorage.getItem("token"));
     //this.getTable();
     this.userid = this.$root.get_id_user(localStorage.getItem("unique"));
-    // await this.getdist_codeForm();
-    // await this.getRegion_nameregion_nameForm();
-    // await this.getBranchForm();
-    // await this.getChannelForm();
-    // await this.getBrandForm();
-    // await this.getStatusProductForm();
-    // await this.fetchMonthlySalesData();
     await this.getAllDatas();
-    await this.getTrendTable();
-    // await this.getSelectData();
+    // await this.getTrendTable();
   },
   methods: {
     async getTrendTable() {
+      var mythis = this;
+
       let offset = 0;
       const limit = 100;
       this.tableTrend = []; // Menyimpan semua data hasil looping
 
+      //http://localhost:8002/
+      //http://178.1.7.230:8207
       try {
-        while (offset < 1000) {
+        while (offset < 30000) {
           const response = await axios.get(
-            `http://178.1.7.230:8207/si/monthly-sales-data?limit=${limit}&offset=${offset}`
+            // `http://localhost:8002/si/monthly-sales-data?limit=${limit}&offset=${offset}`+`${
+              this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data"+`?limit=${limit}&offset=${offset}`+`${
+                this.selectedDistCode.dist_code != undefined &&
+                this.selectedDistCode.dist_code != "All"
+                  ? "&dist_code=" + this.selectedDistCode.dist_code
+                  : "&dist_code="
+              }${
+                this.selectedRegionName.region_name != undefined &&
+                this.selectedRegionName.region_name != "All"
+                  ? "&region_name=" + this.selectedRegionName.region_name
+                  : "&region_name="
+              }${
+                this.selectedBranch.nama_cabang != undefined &&
+                this.selectedBranch.nama_cabang != "All"
+                  ? "&branch=" + this.selectedBranch.kode_cabang
+                  : "&branch="
+              }${
+                this.selectedChannel.chnl_code != undefined &&
+                this.selectedChannel.chnl_code != "All"
+                  ? "&chnl_code=" + this.selectedChannel.chnl_code
+                  : "&chnl_code="
+              }${
+                this.selectedBrand.brand_name != undefined &&
+                this.selectedBrand.brand_name != "All"
+                  ? "&brand_name=" + this.selectedBrand.brand_name
+                  : "&brand_name="
+              }${
+                this.selectedStatusProduct.status_product != undefined &&
+                this.selectedStatusProduct.status_product != "All"
+                  ? "&status_product=" +
+                    this.selectedStatusProduct.status_product
+                  : "&status_product="
+              }${
+                this.selectedYearPeriode.tahun != undefined &&
+                this.selectedYearPeriode.tahun != "All"
+                  ? "&tahun=" + this.selectedYearPeriode.tahun
+                  : "&tahun="
+              }${
+                this.selectedMonth != undefined && this.selectedMonth != "All"
+                  ? "&selected_month=" + this.selectedMonth
+                  : "&selected_month="
+              }`
           );
           const results = response.data.results;
 
@@ -883,7 +928,12 @@ export default {
           offset += limit;
 
           // Check jika data hasil response kosong, maka hentikan proses
-          if (results.length === 0) break;
+          if (results.length === 0) 
+        {
+          this.status_download =1;
+          break;
+        }
+          
         }
 
         console.log("Total data fetched:", this.tableTrend.length);
@@ -891,9 +941,14 @@ export default {
         console.error("Error fetching data:", error);
       }
     },
-    exportDetailToXLS() {
+    async exportDetailToXLS() {
       try {
+        this.$root.presentLoading();
+
+        await this.getTrendTable();
         console.log(this.tableTrend);
+
+        this.$root.stopLoading();
 
         const tables = document.querySelector(".table-trend2");
         const wb = XLSX.utils.table_to_book(tables, {
@@ -1644,7 +1699,7 @@ export default {
             Brand: resData.results[key].brand_name,
             Kategori: resData.results[key].kategori,
             StatusProduct: resData.results[key].status_product,
-            YOP: resData.results[key].tahun,
+            // YOP: resData.results[key].tahun,
             month_1: resData.results[key].month_1,
             month_2: resData.results[key].month_2,
             month_3: resData.results[key].month_3,
@@ -1894,15 +1949,15 @@ export default {
             "text-shadow": "1px 1px 2px rgba(0, 0, 0, 0.3)", // Subtle text shadow for depth
           },
           td: {
-            "text-align": "center", // Center-align table cell text
-            padding: "14px 10px", // Padding for table cell data
-            "font-size": "13px", // Font size for table cell data
-            border: "1px solid #ddd", // Border between table cells
-            "white-space": "nowrap", // Prevent text wrapping
+            "text-align": "center", 
+            padding: "14px 10px",
+            "font-size": "13px", 
+            border: "1px solid #ddd", 
+            "white-space": "nowrap", 
           },
         },
         server: {
-          url: this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data", // "trend",
+          url: this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data", 
           then: (data) =>
             data.results.map((card) => [
               card.id,

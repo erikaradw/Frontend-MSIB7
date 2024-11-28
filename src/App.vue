@@ -443,7 +443,7 @@ export default {
             cmpHalStockDetail: "STOCK DETAIL",
             cmpHalPOCust: "PO CUSTOMER",
           },
-          TREND: {
+          MONITORING: {
             cmpTrend_g: "TREND",
             cmpHalTrend: "TREND SALES",
           },
