@@ -794,7 +794,7 @@ export default {
         //   listHps.map((idTarget) =>
         axios
           // .delete(`http://localhost:8002/si/stock/hapus-banyak-data/${idTarget}`)
-          .delete(`http://localhost:8002/si/stock/hapus-banyak-data`, {
+          .delete(this.$root.apiHost + this.$root.prefixApi + `stock/hapus-banyak-data`, {
             data: this.selectedRows,
           })
           .then((res) => {
@@ -1109,7 +1109,7 @@ export default {
           // axios.delete("http://localhost:8002/M_Region")
           // Request ke backend untuk menghapus file
           axios
-            .delete("http://localhost:8002/si/stockdetail")
+            .delete(this.$root.apiHost + this.$root.prefixApi + "si/stockdetail")
             .then(() => {
               Swal.fire(
                 "Deleted!",
