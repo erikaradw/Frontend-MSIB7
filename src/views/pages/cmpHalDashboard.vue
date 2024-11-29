@@ -37,7 +37,7 @@ export default {
         { title: "Average 6 Bulan", value: "3", note: "0.15%" },
         { title: "Average 9 Bulan", value: "0", note: "0%" },
       ],
-      dataGrafik: [], // Data untuk grafik
+      dataGrafik: [],
     };
   },
   mounted() {
@@ -47,12 +47,17 @@ export default {
     async getGrafik() {
       try {
         const response = await axios.get(
-          "http://localhost:8002/si/grafikTrend"
+          this.$root.apiHost + this.$root.prefixApi + "grafikTrend"
         );
         this.dataGrafik = response.data.data;
         this.renderBranchChart();
       } catch (error) {
         console.error("Error fetching data: ", error);
+        Swal.fire(
+          "Error!",
+          "Failed to fetch grafikTrend data. Please try again.",
+          "error"
+        );
       }
     },
     renderBranchChart() {
