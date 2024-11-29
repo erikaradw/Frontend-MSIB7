@@ -1295,7 +1295,7 @@ export default {
           // axios.delete("http://localhost:8002/M_Region")
           // Request ke backend untuk menghapus file
           axios
-            .delete(this.$root.apiHost + this.$root.prefixApi + "si/salesunit")
+            .delete(this.$root.apiHost + this.$root.prefixApi + "salesunit")
             .then(() => {
               Swal.fire(
                 "Deleted!",
