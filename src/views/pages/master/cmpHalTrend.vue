@@ -877,7 +877,7 @@ export default {
         while (offset < 30000) {
           const response = await axios.get(
             // `http://localhost:8002/si/monthly-sales-data?limit=${limit}&offset=${offset}`+`${
-              this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data"+`?limit=${limit}&offset=${offset}`+`${
+              this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data-download"+`?limit=${limit}&offset=${offset}`+`${
                 this.selectedDistCode.dist_code != undefined &&
                 this.selectedDistCode.dist_code != "All"
                   ? "&dist_code=" + this.selectedDistCode.dist_code
@@ -1075,9 +1075,9 @@ export default {
       let formattedNumber = number.toLocaleString("id-ID");
       return formattedNumber;
     },
-    formatPercentage(value) {
-      return `${Math.round(value)}%`;
-    },
+    // formatPercentage(value) {
+    //   return `${Math.round(value)}%`;
+    // },
     async fetchMonthlySalesData() {
       this.loading = true;
       this.error = null;
@@ -2093,16 +2093,16 @@ export default {
               html(`<span class="pull-left">${card.doi_3_month}</span>`),
               html(`<span class="pull-left">${card.status_trend}</span>`),
               html(
-                `<span class="pull-left">${mythis.formatPercentage(
+                `<span class="pull-left">${
                   card.delta
-                )}</span>`
+                }</span>`
               ),
               html(`<span class="pull-left">${card.qty_po}</span>`),
               html(`<span class="pull-left">${card.qty_sc_reg}</span>`),
               html(
-                `<span class="pull-left">${mythis.formatPercentage(
+                `<span class="pull-left">${
                   card.service_level
-                )}</span>`
+                }</span>`
               ),
               html(`<span class="pull-left">${card.pic}</span>`),
             ]),
