@@ -89,6 +89,24 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
+                  <label for="example-nf-email">cabangCode</label>
+                  <input
+                    type="text"
+                    placeholder="Input cabangCode"
+                    v-model="todo.kode_cabang"
+                    :class="
+                      errorField.kode_cabang
+                        ? 'form-control input-lg input-error'
+                        : 'form-control input-lg'
+                    "
+                    @input="
+                      (val) => (todo.kode_cabang = todo.kode_cabang.toUpperCase())
+                    "
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
                   <label for="example-nf-email">brch_name</label>
                   <input
                     type="text"
