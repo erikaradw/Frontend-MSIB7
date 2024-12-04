@@ -480,7 +480,7 @@
                       CHECK DATA BULK
                     </button> -->
                     <button
-                      @click="saveTodoBulky()"
+                      @click="upload_data_csv()"
                       type="button"
                       class="btn btn-sm btn-primary pull-left"
                       v-show="csv != null"
@@ -917,9 +917,14 @@ export default {
         //   listHps.map((idTarget) =>
         axios
           // .delete(`http://localhost:8002/si/stock/hapus-banyak-data/${idTarget}`)
-          .delete(this.$root.apiHost + this.$root.prefixApi + `salesunit/hapus-banyak-data`, {
-            data: this.selectedRows,
-          })
+          .delete(
+            this.$root.apiHost +
+              this.$root.prefixApi +
+              `salesunit/hapus-banyak-data`,
+            {
+              data: this.selectedRows,
+            }
+          )
           .then((res) => {
             console.log(res);
             // console.log(`Row with ID ${idTarget} deleted successfully.`);
@@ -1398,6 +1403,150 @@ export default {
           /////////////////////////////////////////////////////////////////////
         }
       });
+    },
+    async upload_data_csv() {
+      var mythis = this;
+
+      //Looping data
+      var array_split = [];
+      var nn = 0;
+      var n = 0;
+      var n_split = 100;
+      for (var iii = 0; iii < mythis.csv.length; iii++) {
+        n++;
+        if (n == 1) {
+          var arr1 = [];
+          //array_split[nn] = [];
+          //array_split[nn].push(mythis.csvFinal[iii]);
+          arr1.push(mythis.csv[iii]);
+        } else {
+          //array_split[nn].push(mythis.csvFinal[iii]);
+          arr1.push(mythis.csv[iii]);
+        }
+        if (n == n_split || iii + 1 == mythis.csv.length) {
+          array_split[nn] = arr1;
+          n = 0;
+          nn++;
+        }
+      }
+
+      console.log("total split :" + nn);
+      console.log(array_split);
+      //Looping data
+
+      console.log(mythis.csv);
+      if (mythis.csv == null) {
+        //console.log(this.csv.length);
+        toast.error("Upload CSV terlebih dahulu", { theme: "colored" });
+      } else {
+        //mythis.$root.loader = true;
+
+        Swal.fire({
+          width: "800px",
+          title: "UPLOAD DATA CSV",
+          html: "Mohon tunggu, Upload data sedang berjalan.",
+          icon: "info",
+          allowEscapeKey: false,
+          allowOutsideClick: false,
+          timerProgressBar: true,
+          didOpen: async () => {
+            Swal.showLoading();
+            /////////////////////////////////////////////////////////////////////////
+            try {
+              var array_split_respon = [];
+
+              for (var iii = 0; iii < array_split.length; iii++) {
+                var key_x = "";
+                if (iii == 0) {
+                  key_x = "start";
+                } else if (iii + 1 == array_split.length) {
+                  key_x = "end";
+                } else {
+                  key_x = "onprocess";
+                }
+
+                if (iii == 0 && iii + 1 == array_split.length) {
+                  key_x = "sekalisaja";
+                }
+                var resX = await axios.post(
+                  mythis.$root.apiHost +
+                    mythis.$root.prefixApi +
+                    "salesunitBulky",
+                  {
+                    fileUpload: mythis.fileUpload,
+                    data: array_split[iii],
+                    userid: mythis.userid,
+                    key_x: key_x,
+                  }
+                );
+
+                console.log("AAAAAAAAAAAAAA " + iii);
+                console.log(resX);
+                console.log("AAAAAAAAAAAAAA " + iii);
+                // await mythis.sleep(1000);
+              }
+
+              // mythis.$root.loader = false;
+              mythis.varPengecekan = resX.data.data;
+              console.log(mythis.varPengecekan);
+              Swal.close();
+
+              Swal.fire({
+                title: "Upload Selesai!",
+                text: "Semua data berhasil diupload.",
+                icon: "success",
+                confirmButtonText: "OK",
+              });
+              
+            } catch (error) {
+              console.log(error); // this is the main part. Use the response property from the error object
+              //mythis.$root.loader = false;
+              Swal.close();
+              Swal.fire("Failed!", error.message, "error");
+            }
+            /////////////////////////////////////////////////////////////////////////
+          },
+        });
+        mythis.show_modalBulk();
+
+        /*
+        axios
+          .post(
+            mythis.$root.apiHostWmsTPS + "wms/m_upload_ol_upload_data_csv",
+            {
+              fileUpload: mythis.fileUpload,
+              data: mythis.csv,
+              userid: mythis.userid,
+            }
+          )
+          .then((res) => {
+            //   Swal.fire("Created!", res.data.message, "success");
+            //   mythis.$root.loader = false;
+
+            //   mythis.refreshTable();
+            //   mythis.resetForm();
+            //   mythis.close();
+            mythis.$root.loader = false;
+            mythis.varPengecekan = res.data.data;
+            console.log(mythis.varPengecekan);
+          })
+          .catch(function (error) {
+            mythis.$root.loader = false;
+            toast.error("Data ERROR", { theme: "colored" });
+            //mythis.$root.loader = false;
+            if (error.response) {
+              if (error.response.status == 413) {
+                toast.error("Data to large", { theme: "colored" });
+              }
+              console.log(error.response);
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log("Error", error.message);
+            }
+          });
+          */
+      }
     },
     padTo2Digits(num) {
       return num.toString().padStart(2, "0");
