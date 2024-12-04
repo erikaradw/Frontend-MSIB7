@@ -27,8 +27,8 @@
           <canvas id="brandDonutChart"></canvas>
         </div>
         <div class="chart-card chart-half">
-          <h3>Monthly Sales Trend</h3>
-          <canvas id="barChart"></canvas>
+          <h3>Average Unit by SKU</h3>
+          <canvas id="itemChart"></canvas>
         </div>
       </div>
     </section>
@@ -50,12 +50,14 @@ export default {
         { title: "Average 3 Bulan", value: "29", note: null },
       ],
       dataGrafik: [],
-      dataBrand: [], // New data for additional charts
+      dataBrand: [],
+      dataSKU: [],
     };
   },
   mounted() {
     this.getGrafik();
     this.getGrafikByBrand();
+    // this.getGrafikBySKU();
   },
   methods: {
     async getGrafik() {
@@ -90,11 +92,27 @@ export default {
         );
       }
     },
+    async getGrafikbySKU() {
+      try {
+        const response = await axios.get(
+          this.$root.apiHost + this.$root.prefixApi + "grafikTrendBySKU"
+        );
+        this.dataSKU = response.data.data;
+        this.renderItemChart();
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        Swal.fire(
+          "Error!",
+          "Failed to fetch grafikTrend data. Please try again.",
+          "error"
+        );
+      }
+    },
+
     renderBranchChart() {
       const canvas = document.getElementById("branchChart");
       const ctx = canvas.getContext("2d");
 
-      // Existing branch chart implementation remains the same as in previous code
       const labels = this.dataGrafik.map((item) => item.nama_cabang);
       const barWidth = 50;
       const totalWidth = labels.length * barWidth;
@@ -187,7 +205,7 @@ export default {
       const labels = this.dataBrand.map((item) => item.brand_name); // Nama brand
       const values = this.dataBrand.map(
         (item) => item.total_yearly_average_unit
-      ); 
+      );
 
       // Hitung total nilai
       const totalValue = values.reduce((sum, value) => sum + value, 0);
@@ -196,7 +214,7 @@ export default {
       const percentages = values.map((value) =>
         ((value / totalValue) * 100).toFixed(2)
       );
-      
+
       const backgroundColors = [
         "rgba(54, 162, 235, 0.7)",
         "rgba(255, 99, 132, 0.7)",
@@ -208,7 +226,7 @@ export default {
       ];
 
       const data = {
-        labels: labels, 
+        labels: labels,
         datasets: [
           {
             data: values, // Tetap gunakan nilai untuk data grafik
@@ -246,18 +264,65 @@ export default {
       new Chart(ctx, config);
     },
 
-    renderMonthlyBarChart() {
-      const canvas = document.getElementById("barChart");
+    renderItemChart() {
+      const canvas = document.getElementById("itemChart");
       const ctx = canvas.getContext("2d");
 
+      const labels = this.dataSKU.map((item) => item.item_name);
+      const barWidth = 50;
+      const totalWidth = labels.length * barWidth;
+      canvas.style.width = `${totalWidth}px`;
+
+      const yearlyData = this.dataSKU.map(
+        (item) => item.total_yearly_average_unit
+      );
+      const nineMonthData = this.dataSKU.map(
+        (item) => item.total_9_month_average_unit
+      );
+      const sixMonthData = this.dataSKU.map(
+        (item) => item.total_6_month_average_unit
+      );
+      const threeMonthData = this.dataSKU.map(
+        (item) => item.total_3_month_average_unit
+      );
+
+      const maxValue = Math.max(
+        ...yearlyData,
+        ...nineMonthData,
+        ...sixMonthData,
+        ...threeMonthData
+      );
+      const yAxisMax = Math.ceil(maxValue * 1.2);
+
       const data = {
-        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        labels: labels,
         datasets: [
           {
-            label: "Monthly Sales",
-            data: [1200, 1900, 1600, 2000, 1800, 2200],
+            label: "Yearly Average",
+            data: yearlyData,
+            backgroundColor: "rgba(54, 162, 235, 0.7)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1,
+          },
+          {
+            label: "Average 9 Months",
+            data: nineMonthData,
+            backgroundColor: "rgba(255, 206, 86, 0.7)",
+            borderColor: "rgba(255, 206, 86, 1)",
+            borderWidth: 1,
+          },
+          {
+            label: "Average 6 Months",
+            data: sixMonthData,
             backgroundColor: "rgba(75, 192, 192, 0.7)",
             borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+          {
+            label: "Average 3 Months",
+            data: threeMonthData,
+            backgroundColor: "rgba(153, 102, 255, 0.7)",
+            borderColor: "rgba(153, 102, 255, 1)",
             borderWidth: 1,
           },
         ],
@@ -267,10 +332,19 @@ export default {
         type: "bar",
         data: data,
         options: {
-          responsive: true,
+          responsive: false,
+          plugins: {
+            legend: {
+              position: "top",
+            },
+          },
           scales: {
+            x: {
+              beginAtZero: true,
+            },
             y: {
               beginAtZero: true,
+              max: yAxisMax,
             },
           },
         },

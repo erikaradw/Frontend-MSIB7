@@ -633,6 +633,8 @@ export default {
         BranchCode: "BranchCode",
       },
       newlimit: 10,
+      total_batch_data: 0,
+      batch_data: 0,
     };
   },
   async mounted() {
@@ -1203,6 +1205,8 @@ export default {
       var nn = 0;
       var n = 0;
       var n_split = 100;
+      mythis.batch_data = 0;
+      mythis.total_batch_data=0;
       for (var iii = 0; iii < mythis.csv.length; iii++) {
         n++;
         if (n == 1) {
@@ -1231,22 +1235,29 @@ export default {
         toast.error("Upload CSV terlebih dahulu", { theme: "colored" });
       } else {
         //mythis.$root.loader = true;
-
+        let timerInterval;
         Swal.fire({
           width: "800px",
           title: "UPLOAD DATA CSV",
-          html: "Mohon tunggu, Upload data sedang berjalan.",
+          html: "Mohon tunggu, Upload data sedang berjalan. <b></b>",
           icon: "info",
           allowEscapeKey: false,
           allowOutsideClick: false,
           timerProgressBar: true,
           didOpen: async () => {
             Swal.showLoading();
+            const timer = Swal.getPopup().querySelector("b");
+            timerInterval = setInterval(() => {
+              timer.textContent =
+                mythis.batch_data + " of " + mythis.total_batch_data;
+            }, 100);
             /////////////////////////////////////////////////////////////////////////
             try {
               var array_split_respon = [];
+              mythis.total_batch_data = array_split.length;
 
               for (var iii = 0; iii < array_split.length; iii++) {
+                mythis.batch_data = iii;
                 var key_x = "";
                 if (iii == 0) {
                   key_x = "start";
@@ -1262,7 +1273,7 @@ export default {
                 var resX = await axios.post(
                   mythis.$root.apiHost +
                     mythis.$root.prefixApi +
-                    "pocustBulky",
+                    "stockdetailBulky",
                   {
                     fileUpload: mythis.fileUpload,
                     data: array_split[iii],
