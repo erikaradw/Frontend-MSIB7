@@ -20,11 +20,11 @@
           <canvas id="branchChart"></canvas>
         </div>
       </div>
-      
+
       <div class="chart-row">
         <div class="chart-card chart-half">
-          <h3>Sales Distribution by Category</h3>
-          <canvas id="pieChart"></canvas>
+          <h3>Sales Distribution by Brand</h3>
+          <canvas id="brandDonutChart"></canvas>
         </div>
         <div class="chart-card chart-half">
           <h3>Monthly Sales Trend</h3>
@@ -45,17 +45,17 @@ export default {
     return {
       metrics: [
         { title: "Jumlah SKU", value: "1992", note: null },
-        { title: "Average 3 Bulan", value: "29", note: null },
-        { title: "Average 6 Bulan", value: "3", note: "0.15%" },
         { title: "Average 9 Bulan", value: "0", note: "0%" },
+        { title: "Average 6 Bulan", value: "3", note: "0.15%" },
+        { title: "Average 3 Bulan", value: "29", note: null },
       ],
       dataGrafik: [],
-      salesData: [], // New data for additional charts
+      dataBrand: [], // New data for additional charts
     };
   },
   mounted() {
     this.getGrafik();
-    this.getSalesData();
+    this.getGrafikByBrand();
   },
   methods: {
     async getGrafik() {
@@ -74,23 +74,18 @@ export default {
         );
       }
     },
-    async getSalesData() {
+    async getGrafikByBrand() {
       try {
-        // Simulate data fetch or replace with actual API call
-        this.salesData = [
-          { category: "Electronics", sales: 4500 },
-          { category: "Clothing", sales: 3200 },
-          { category: "Home & Kitchen", sales: 2800 },
-          { category: "Books", sales: 1500 },
-          { category: "Sports", sales: 2000 }
-        ];
-        this.renderPieChart();
-        this.renderMonthlyBarChart();
+        const response = await axios.get(
+          this.$root.apiHost + this.$root.prefixApi + "grafikTrendByBrand"
+        );
+        this.dataBrand = response.data.data; // Simpan data dari API
+        this.renderBrandDonutChart(); // Render grafik donat
       } catch (error) {
-        console.error("Error fetching sales data: ", error);
+        console.error("Error fetching data: ", error);
         Swal.fire(
           "Error!",
-          "Failed to fetch sales data. Please try again.",
+          "Failed to fetch grafikTrendByBrand data. Please try again.",
           "error"
         );
       }
@@ -184,77 +179,105 @@ export default {
 
       new Chart(ctx, config);
     },
-    renderPieChart() {
-      const canvas = document.getElementById("pieChart");
+    renderBrandDonutChart() {
+      const canvas = document.getElementById("brandDonutChart");
       const ctx = canvas.getContext("2d");
 
+      // Data dari API
+      const labels = this.dataBrand.map((item) => item.brand_name); // Nama brand
+      const values = this.dataBrand.map(
+        (item) => item.total_yearly_average_unit
+      ); 
+
+      // Hitung total nilai
+      const totalValue = values.reduce((sum, value) => sum + value, 0);
+
+      // Hitung persentase setiap brand
+      const percentages = values.map((value) =>
+        ((value / totalValue) * 100).toFixed(2)
+      );
+      
+      const backgroundColors = [
+        "rgba(54, 162, 235, 0.7)",
+        "rgba(255, 99, 132, 0.7)",
+        "rgba(255, 206, 86, 0.7)",
+        "rgba(75, 192, 192, 0.7)",
+        "rgba(153, 102, 255, 0.7)",
+        "rgba(201, 203, 207, 0.7)",
+        "rgba(255, 159, 64, 0.7)",
+      ];
+
       const data = {
-        labels: this.salesData.map(item => item.category),
-        datasets: [{
-          data: this.salesData.map(item => item.sales),
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(54, 162, 235, 0.7)',
-            'rgba(255, 206, 86, 0.7)',
-            'rgba(75, 192, 192, 0.7)',
-            'rgba(153, 102, 255, 0.7)'
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)'
-          ],
-          borderWidth: 1
-        }]
+        labels: labels, 
+        datasets: [
+          {
+            data: values, // Tetap gunakan nilai untuk data grafik
+            backgroundColor: backgroundColors, // Warna segmen
+            borderColor: backgroundColors.map((color) =>
+              color.replace("0.7", "1")
+            ), // Tepi segmen
+            borderWidth: 1,
+          },
+        ],
       };
 
       const config = {
-        type: 'pie',
+        type: "doughnut",
         data: data,
         options: {
           responsive: true,
           plugins: {
             legend: {
-              position: 'right',
-            }
-          }
-        }
+              position: "right", // Legenda di sisi kanan
+            },
+            tooltip: {
+              callbacks: {
+                label: (tooltipItem) => {
+                  const label = tooltipItem.label || "";
+                  const value = tooltipItem.raw || 0;
+                  const percentage = ((value / totalValue) * 100).toFixed(2); // Hitung persentase
+                  return `${label}: ${percentage}% (${value.toLocaleString()})`; // Tampilkan persentase dan nilai
+                },
+              },
+            },
+          },
+        },
       };
-
       new Chart(ctx, config);
     },
+
     renderMonthlyBarChart() {
       const canvas = document.getElementById("barChart");
       const ctx = canvas.getContext("2d");
 
       const data = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Monthly Sales',
-          data: [1200, 1900, 1600, 2000, 1800, 2200],
-          backgroundColor: 'rgba(75, 192, 192, 0.7)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        datasets: [
+          {
+            label: "Monthly Sales",
+            data: [1200, 1900, 1600, 2000, 1800, 2200],
+            backgroundColor: "rgba(75, 192, 192, 0.7)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+        ],
       };
 
       const config = {
-        type: 'bar',
+        type: "bar",
         data: data,
         options: {
           responsive: true,
           scales: {
             y: {
-              beginAtZero: true
-            }
-          }
-        }
+              beginAtZero: true,
+            },
+          },
+        },
       };
 
       new Chart(ctx, config);
-    }
+    },
   },
 };
 </script>
