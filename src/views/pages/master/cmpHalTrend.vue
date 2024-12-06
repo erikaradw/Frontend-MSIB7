@@ -130,8 +130,6 @@
         <h2>
           <strong>TREND SALES {{ $root.judulHalaman }}</strong>
         </h2>
-
-        <i v-if="!status_table" class="fa fa-spinner fa-spin text-default"></i>
       </div>
       <!-- END Block Title -->
 
@@ -303,9 +301,8 @@
             @click="exportDetailToXLS"
           >
             <i class="fas fa-file-excel"></i> Export Excel
+          </button>
 
-            </button>
-          
           <!-- <div class="button-container">
             <download-excel
               v-if="status_table"
@@ -852,7 +849,7 @@ export default {
       },
       newlimit: 10,
 
-      status_download :0,
+      status_download: 0,
     };
   },
   async mounted() {
@@ -877,7 +874,11 @@ export default {
         while (offset < 30000) {
           const response = await axios.get(
             // `http://localhost:8002/si/monthly-sales-data?limit=${limit}&offset=${offset}`+`${
-              this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data-download"+`?limit=${limit}&offset=${offset}`+`${
+            this.$root.apiHost +
+              this.$root.prefixApi +
+              "monthly-sales-data-download" +
+              `?limit=${limit}&offset=${offset}` +
+              `${
                 this.selectedDistCode.dist_code != undefined &&
                 this.selectedDistCode.dist_code != "All"
                   ? "&dist_code=" + this.selectedDistCode.dist_code
@@ -928,12 +929,10 @@ export default {
           offset += limit;
 
           // Check jika data hasil response kosong, maka hentikan proses
-          if (results.length === 0) 
-        {
-          this.status_download =1;
-          break;
-        }
-          
+          if (results.length === 0) {
+            this.status_download = 1;
+            break;
+          }
         }
 
         console.log("Total data fetched:", this.tableTrend.length);
@@ -1949,15 +1948,15 @@ export default {
             "text-shadow": "1px 1px 2px rgba(0, 0, 0, 0.3)", // Subtle text shadow for depth
           },
           td: {
-            "text-align": "center", 
+            "text-align": "center",
             padding: "14px 10px",
-            "font-size": "13px", 
-            border: "1px solid #ddd", 
-            "white-space": "nowrap", 
+            "font-size": "13px",
+            border: "1px solid #ddd",
+            "white-space": "nowrap",
           },
         },
         server: {
-          url: this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data", 
+          url: this.$root.apiHost + this.$root.prefixApi + "monthly-sales-data",
           then: (data) =>
             data.results.map((card) => [
               card.id,
@@ -2092,18 +2091,10 @@ export default {
               html(`<span class="pull-left">${card.stock_on_hand_unit}</span>`),
               html(`<span class="pull-left">${card.doi_3_month}</span>`),
               html(`<span class="pull-left">${card.status_trend}</span>`),
-              html(
-                `<span class="pull-left">${
-                  card.delta
-                }</span>`
-              ),
+              html(`<span class="pull-left">${card.delta}</span>`),
               html(`<span class="pull-left">${card.qty_po}</span>`),
               html(`<span class="pull-left">${card.qty_sc_reg}</span>`),
-              html(
-                `<span class="pull-left">${
-                  card.service_level
-                }</span>`
-              ),
+              html(`<span class="pull-left">${card.service_level}</span>`),
               html(`<span class="pull-left">${card.pic}</span>`),
             ]),
           total: (data) => data.count,
