@@ -58,8 +58,26 @@ export default {
     this.getGrafik();
     this.getGrafikByBrand();
     // this.getGrafikBySKU();
+    // this.getMetrics();
   },
   methods: {
+    async getMetrics() {
+      try {
+        const response = await axios.get('/api/metrics');
+        this.updateMetricsData(response.data);
+      } catch (error) {
+        console.error('Error fetching metrics data: ', error);
+        // Tampilkan pesan error yang sesuai
+      }
+    },
+    updateMetricsData(data) {
+      this.metrics[0].value = data.totalSKU;
+      this.metrics[1].value = data.average9Bulan.toFixed(0);
+      this.metrics[1].note = `${(data.average9Bulan * 100).toFixed(2)}%`;
+      this.metrics[2].value = data.average6Bulan.toFixed(0);
+      this.metrics[2].note = `${(data.average6Bulan * 100).toFixed(2)}%`;
+      this.metrics[3].value = data.average3Bulan.toFixed(0);
+    },
     async getGrafik() {
       try {
         const response = await axios.get(
