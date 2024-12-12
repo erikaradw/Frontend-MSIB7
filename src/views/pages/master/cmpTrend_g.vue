@@ -739,11 +739,6 @@ export default {
         november1: false,
         desember1: false,
       },
-      // watch: {
-      //   selectedYearPeriode(newYear) {
-      //     this.filterTableByYear(newYear);
-      //   },
-      // },
 
       userid: 0,
       status_table: false,
@@ -1063,6 +1058,7 @@ export default {
         DesemberStock: "DesemberStock",
       },
       newlimit: 10,
+      status_download: 0,
     };
   },
   async mounted() {
@@ -1097,7 +1093,7 @@ export default {
         select.style.border = "1px solid #ccc";
         select.style.borderRadius = "4px";
 
-        const options = [10, 20, 50, 100]; 
+        const options = [10, 20, 50, 100];
         options.forEach((value) => {
           const option = document.createElement("option");
           option.value = value;
@@ -1131,14 +1127,26 @@ export default {
       }
     },
     async getTrendTable() {
+      var mythis = this;
+
       let offset = 0;
       const limit = 100;
       this.tableTrend = []; // Menyimpan semua data hasil looping
 
       try {
-        while (offset < 1000) {
+        while (offset < 10000) {
           const response = await axios.get(
-            `http://178.1.7.230:8207/si/monthly-sales-trend-g?limit=${limit}&offset=${offset}`
+            // `http://178.1.7.230:8207/si/monthly-sales-trend-g?limit=${limit}&offset=${offset}`
+            this.$root.apiHost +
+              this.$root.prefixApi +
+              "monthly-sales-trend-g" +
+              `?limit=${limit}&offset=${offset}` +
+              `${
+                this.selectedYearPeriode != undefined &&
+                this.selectedYearPeriode != "All"
+                  ? "&tahun=" + this.selectedYearPeriode
+                  : "&tahun="
+              }`
           );
           const results = response.data.results;
 
@@ -1149,7 +1157,10 @@ export default {
           offset += limit;
 
           // Check jika data hasil response kosong, maka hentikan proses
-          if (results.length === 0) break;
+          if (results.length === 0) {
+            this.status_download = 1;
+            break;
+          }
         }
 
         console.log("Total data fetched:", this.tableTrend.length);
@@ -1158,16 +1169,21 @@ export default {
       }
     },
 
-    exportDetailToXLS() {
+    async exportDetailToXLS() {
       try {
+        this.$root.presentLoading();
+
+        await this.getTrendTable();
         console.log(this.tableTrend);
+
+        this.$root.stopLoading();
 
         const tables = document.querySelector(".table-trend2");
         const wb = XLSX.utils.table_to_book(tables, {
           sheet: "Sheet JS",
           bookType: "xls",
         });
-        XLSX.writeFile(wb, "TrendSales.xls");
+        XLSX.writeFile(wb, "TrendSalesWarehouse.xls");
 
         // this.$root.loader = true;
       } catch (error) {
@@ -1231,22 +1247,22 @@ export default {
       let formattedNumber = number.toLocaleString("id-ID");
       return formattedNumber;
     },
-    async fetchMonthlySalesData() {
-      this.loading = true;
-      this.error = null;
+    // async fetchMonthlySalesData() {
+    //   this.loading = true;
+    //   this.error = null;
 
-      try {
-        const response = await axios.get(
-          this.$root.apiHost + this.$root.prefixApi + "monthly-sales-trend-g"
-        ); // Ganti dengan URL API Anda
-        this.monthlySalesData = response.data;
-      } catch (error) {
-        console.error("Error fetching monthly sales data:", error);
-        this.error = "Failed to fetch data. Please try again later.";
-      } finally {
-        this.loading = false;
-      }
-    },
+    //   try {
+    //     const response = await axios.get(
+    //       this.$root.apiHost + this.$root.prefixApi + "monthly-sales-trend-g"
+    //     ); // Ganti dengan URL API Anda
+    //     this.monthlySalesData = response.data;
+    //   } catch (error) {
+    //     console.error("Error fetching monthly sales data:", error);
+    //     this.error = "Failed to fetch data. Please try again later.";
+    //   } finally {
+    //     this.loading = false;
+    //   }
+    // },
     async getAllDatas() {
       // Code to fetch and populate dataYearPeriode
       const urlGetTrend =
@@ -1254,15 +1270,15 @@ export default {
       try {
         this.dataYearPeriode = [
           new Date().getFullYear(),
-          new Date().getFullYear() -1,
-          new Date().getFullYear() -2,
+          new Date().getFullYear() - 1,
+          new Date().getFullYear() - 2,
         ];
         const response = await axios.get(urlGetTrend);
         // if (response.data.status && response.data.data) {
         //   this.dataYearPeriode = response.data.data
         //     .map((item) => item.tahun)
         //     .filter((year) => year !== "Total");
-          
+
         // }
       } catch (error) {
         console.error("Error fetching year data:", error);
@@ -1373,37 +1389,6 @@ export default {
         console.error("File upload failed:", error);
         alert("File upload failed");
       }
-    },
-
-    onChangeDistCodeHandler(e) {
-      // this.todo.dist_code = e.dist_code;
-      this.todo.dist_code = this.selectedDistCode;
-      // this.refreshTable();
-    },
-
-    onChangeRegionNameHandler(e) {
-      this.todo.region_name = this.selectedRegionName;
-      // this.refreshTable();
-    },
-
-    onChangeBranchHandler(e) {
-      this.todo.nama_cabang = e.nama_cabang;
-      // this.refreshTable();
-    },
-
-    onChangeChannelHandler(e) {
-      this.todo.chnl_code = this.selectedChannel;
-      // this.refreshTable();
-    },
-
-    onChangeBrandHandler(e) {
-      this.todo.brand_name = this.selectedBrand;
-      // this.refreshTable();
-    },
-
-    onChangeStatusProductHandler(e) {
-      this.todo.status_product = this.selectedStatusProduct;
-      // this.refreshTable();
     },
     onChangeYearPeriodeHandler(e) {
       this.todo.tahun = this.selectedYearPeriode;
@@ -1656,139 +1641,139 @@ export default {
         ].join(":")
       );
     },
-    async getDataExportExcel() {
-      var mythis = this;
-      mythis.$root.presentLoading();
-      var nn = 0;
-      var count = 1;
-      var limitx = 10000;
-      var offsetx = 0;
-      var baris = 0;
+    // async getDataExportExcel() {
+    //   var mythis = this;
+    //   mythis.$root.presentLoading();
+    //   var nn = 0;
+    //   var count = 1;
+    //   var limitx = 10000;
+    //   var offsetx = 0;
+    //   var baris = 0;
 
-      var nomor_x = 1;
-      var br_pdf = 0;
-      var br_flag = 0;
-      var br_string = "";
-      var html = "";
+    //   var nomor_x = 1;
+    //   var br_pdf = 0;
+    //   var br_flag = 0;
+    //   var br_string = "";
+    //   var html = "";
 
-      var baris_excel = 0;
-      // mythis.json_data = [];
-      mythis.data_x_excel = [];
+    //   var baris_excel = 0;
+    //   // mythis.json_data = [];
+    //   mythis.data_x_excel = [];
 
-      while (count > 0) {
-        offsetx = limitx * nn;
+    //   while (count > 0) {
+    //     offsetx = limitx * nn;
 
-        const reqData = await axios({
-          method: "get",
-          url:
-            mythis.$root.apiHost +
-            "si/monthly-sales-trend-g?offset=" +
-            offsetx +
-            "&limit=" +
-            limitx,
-        });
+    //     const reqData = await axios({
+    //       method: "get",
+    //       url:
+    //         mythis.$root.apiHost +
+    //         "si/monthly-sales-trend-g?offset=" +
+    //         offsetx +
+    //         "&limit=" +
+    //         limitx,
+    //     });
 
-        console.log(reqData);
+    //     console.log(reqData);
 
-        const resData = reqData.data;
-        console.log(resData.results.length);
-        if (resData.results.length == 0) {
-          count = 0;
-        }
+    //     const resData = reqData.data;
+    //     console.log(resData.results.length);
+    //     if (resData.results.length == 0) {
+    //       count = 0;
+    //     }
 
-        Object.keys(resData.results).forEach(function (key) {
-          const countries_x = {
-            nomor: nomor_x,
+    //     Object.keys(resData.results).forEach(function (key) {
+    //       const countries_x = {
+    //         nomor: nomor_x,
 
-            DistCode: " " + resData.results[key].dist_code,
-            Channel: resData.results[key].chnl_code,
-            Region: resData.results[key].region_name,
-            Area: resData.results[key].area_name,
-            KodeCabang: resData.results[key].kode_cabang,
-            Cabang: resData.results[key].nama_cabang,
-            ParentCode: resData.results[key].parent_code,
-            ItemCode: resData.results[key].item_code,
-            SKU: resData.results[key].item_name,
-            Brand: resData.results[key].brand_name,
-            Kategori: resData.results[key].kategori,
-            StatusProduct: resData.results[key].status_product,
-            YOP: resData.results[key].tahun,
-            JanuariSales: resData.results[key].januari,
-            FebruariSales: resData.results[key].februari,
-            MaretSales: resData.results[key].maret,
-            AprilSales: resData.results[key].april,
-            MeiSales: resData.results[key].mei,
-            JuniSales: resData.results[key].juni,
-            JuliSales: resData.results[key].juli,
-            AgustusSales: resData.results[key].agustus,
-            SeptemberSales: resData.results[key].september,
-            OktoberSales: resData.results[key].oktober,
-            NovemberSales: resData.results[key].november,
-            DesemberSales: resData.results[key].desember,
+    //         DistCode: " " + resData.results[key].dist_code,
+    //         Channel: resData.results[key].chnl_code,
+    //         Region: resData.results[key].region_name,
+    //         Area: resData.results[key].area_name,
+    //         KodeCabang: resData.results[key].kode_cabang,
+    //         Cabang: resData.results[key].nama_cabang,
+    //         ParentCode: resData.results[key].parent_code,
+    //         ItemCode: resData.results[key].item_code,
+    //         SKU: resData.results[key].item_name,
+    //         Brand: resData.results[key].brand_name,
+    //         Kategori: resData.results[key].kategori,
+    //         StatusProduct: resData.results[key].status_product,
+    //         YOP: resData.results[key].tahun,
+    //         JanuariSales: resData.results[key].januari,
+    //         FebruariSales: resData.results[key].februari,
+    //         MaretSales: resData.results[key].maret,
+    //         AprilSales: resData.results[key].april,
+    //         MeiSales: resData.results[key].mei,
+    //         JuniSales: resData.results[key].juni,
+    //         JuliSales: resData.results[key].juli,
+    //         AgustusSales: resData.results[key].agustus,
+    //         SeptemberSales: resData.results[key].september,
+    //         OktoberSales: resData.results[key].oktober,
+    //         NovemberSales: resData.results[key].november,
+    //         DesemberSales: resData.results[key].desember,
 
-            BeliJanuari: resData.results[key].beli_januari,
-            BeliFebruari: resData.results[key].beli_februari,
-            BeliMaret: resData.results[key].beli_maret,
-            BeliApril: resData.results[key].beli_april,
-            BeliMei: resData.results[key].beli_mei,
-            BeliJuni: resData.results[key].beli_juni,
-            BeliJuli: resData.results[key].beli_juli,
-            BeliAgustus: resData.results[key].beli_agustus,
-            BeliSeptember: resData.results[key].beli_september,
-            BeliOktober: resData.results[key].beli_oktober,
-            BeliNovember: resData.results[key].beli_november,
-            BeliDesember: resData.results[key].beli_desember,
-            JanuariStock: resData.results[key].januari1,
-            FebruariStock: resData.results[key].februari1,
-            MaretStock: resData.results[key].maret1,
-            AprilStock: resData.results[key].april1,
-            MeiStock: resData.results[key].mei1,
-            JuniStock: resData.results[key].juni1,
-            JuliStock: resData.results[key].juli1,
-            AgustusStock: resData.results[key].agustus1,
-            SeptemberStock: resData.results[key].september1,
-            OktoberStock: resData.results[key].oktober1,
-            NovemberStock: resData.results[key].november1,
-            DesemberStock: resData.results[key].desember1,
-          };
-          mythis.data_x_excel[baris_excel] = countries_x;
+    //         BeliJanuari: resData.results[key].beli_januari,
+    //         BeliFebruari: resData.results[key].beli_februari,
+    //         BeliMaret: resData.results[key].beli_maret,
+    //         BeliApril: resData.results[key].beli_april,
+    //         BeliMei: resData.results[key].beli_mei,
+    //         BeliJuni: resData.results[key].beli_juni,
+    //         BeliJuli: resData.results[key].beli_juli,
+    //         BeliAgustus: resData.results[key].beli_agustus,
+    //         BeliSeptember: resData.results[key].beli_september,
+    //         BeliOktober: resData.results[key].beli_oktober,
+    //         BeliNovember: resData.results[key].beli_november,
+    //         BeliDesember: resData.results[key].beli_desember,
+    //         JanuariStock: resData.results[key].januari1,
+    //         FebruariStock: resData.results[key].februari1,
+    //         MaretStock: resData.results[key].maret1,
+    //         AprilStock: resData.results[key].april1,
+    //         MeiStock: resData.results[key].mei1,
+    //         JuniStock: resData.results[key].juni1,
+    //         JuliStock: resData.results[key].juli1,
+    //         AgustusStock: resData.results[key].agustus1,
+    //         SeptemberStock: resData.results[key].september1,
+    //         OktoberStock: resData.results[key].oktober1,
+    //         NovemberStock: resData.results[key].november1,
+    //         DesemberStock: resData.results[key].desember1,
+    //       };
+    //       mythis.data_x_excel[baris_excel] = countries_x;
 
-          br_pdf++;
-          baris_excel++;
-          nomor_x++;
-          ////////////////////////////////////////////////////////
-          ////////////////////////////////////////////////////////
-        });
+    //       br_pdf++;
+    //       baris_excel++;
+    //       nomor_x++;
+    //       ////////////////////////////////////////////////////////
+    //       ////////////////////////////////////////////////////////
+    //     });
 
-        nn = nn + 1;
-        if (resData.count < resData.nomorBaris) {
-          count = 0;
-        }
-        if (nn >= 100) {
-          count = 0;
-        }
-      }
+    //     nn = nn + 1;
+    //     if (resData.count < resData.nomorBaris) {
+    //       count = 0;
+    //     }
+    //     if (nn >= 100) {
+    //       count = 0;
+    //     }
+    //   }
 
-      baris_excel++;
-      //Penutup Excel
+    //   baris_excel++;
+    //   //Penutup Excel
 
-      baris_excel++;
-      var countries_x = {
-        nomor: "",
-        nama: "Print Date",
-        nik: mythis.formatDate(new Date()),
-      };
-      mythis.data_x_excel[baris_excel] = countries_x;
+    //   baris_excel++;
+    //   var countries_x = {
+    //     nomor: "",
+    //     nama: "Print Date",
+    //     nik: mythis.formatDate(new Date()),
+    //   };
+    //   mythis.data_x_excel[baris_excel] = countries_x;
 
-      mythis.json_data = mythis.data_x_excel;
-      mythis.flagDownloadXLS = 1;
+    //   mythis.json_data = mythis.data_x_excel;
+    //   mythis.flagDownloadXLS = 1;
 
-      var a = new Date().toLocaleString("en-GB");
-      mythis.nama_excelnya = "MASTER_TREND_ANALYSIS_" + a + ".xlsx";
-      // mythis.nama_sheetnya = mythis.nama_excelnya;
+    //   var a = new Date().toLocaleString("en-GB");
+    //   mythis.nama_excelnya = "MASTER_TREND_ANALYSIS_" + a + ".xlsx";
+    //   // mythis.nama_sheetnya = mythis.nama_excelnya;
 
-      mythis.$root.stopLoading();
-    },
+    //   mythis.$root.stopLoading();
+    // },
 
     download_excel_xyz() {},
     async startDownload() {
@@ -1800,204 +1785,204 @@ export default {
       this.fileUpload = csvInput;
       console.log(csvInput);
     },
-    async exportPdf() {
-      const mythis = this;
-      mythis.$root.presentLoading();
+    // async exportPdf() {
+    //   const mythis = this;
+    //   mythis.$root.presentLoading();
 
-      try {
-        let allData = [];
-        let count = 1;
-        let nn = 0;
-        const limitx = 100;
+    //   try {
+    //     let allData = [];
+    //     let count = 1;
+    //     let nn = 0;
+    //     const limitx = 100;
 
-        while (count > 0) {
-          const offsetx = limitx * nn;
+    //     while (count > 0) {
+    //       const offsetx = limitx * nn;
 
-          const reqData = await axios({
-            method: "get",
-            url:
-              mythis.$root.apiHost +
-              "si/trend?offset=" +
-              offsetx +
-              "&limit=" +
-              limitx,
-          });
+    //       const reqData = await axios({
+    //         method: "get",
+    //         url:
+    //           mythis.$root.apiHost +
+    //           "si/trend?offset=" +
+    //           offsetx +
+    //           "&limit=" +
+    //           limitx,
+    //       });
 
-          const resData = reqData.data;
-          allData = [...allData, ...resData.results];
+    //       const resData = reqData.data;
+    //       allData = [...allData, ...resData.results];
 
-          if (resData.results.length === 0 || resData.results.length < limitx) {
-            count = 0;
-          }
+    //       if (resData.results.length === 0 || resData.results.length < limitx) {
+    //         count = 0;
+    //       }
 
-          nn++;
-          if (nn >= 100) {
-            // Safety check to prevent infinite loop
-            count = 0;
-          }
-        }
+    //       nn++;
+    //       if (nn >= 100) {
+    //         // Safety check to prevent infinite loop
+    //         count = 0;
+    //       }
+    //     }
 
-        const doc = new jsPDF();
-        let totalPagesExp = "{total_pages_count_string}";
+    //     const doc = new jsPDF();
+    //     let totalPagesExp = "{total_pages_count_string}";
 
-        doc.setFontSize(18);
-        doc.text("Master Trend Analysis Report", 14, 22);
-        doc.setFontSize(11);
-        doc.setTextColor(100);
+    //     doc.setFontSize(18);
+    //     doc.text("Master Trend Analysis Report", 14, 22);
+    //     doc.setFontSize(11);
+    //     doc.setTextColor(100);
 
-        // Add Created By and Created At information
-        if (allData.length > 0) {
-          const firstRecord = allData[0];
-          doc.setFontSize(10);
-        }
+    //     // Add Created By and Created At information
+    //     if (allData.length > 0) {
+    //       const firstRecord = allData[0];
+    //       doc.setFontSize(10);
+    //     }
 
-        doc.autoTable({
-          theme: "striped",
-          head: [
-            [
-              "No",
-              "Distributor",
-              "Channel",
-              "Region",
-              "Area",
-              "Kode Cabang",
-              "Cabang",
-              "Parent Code",
-              "Item Code",
-              "SKU",
-              "Brand",
-              "Kategori",
-              "Status Product",
-              "YOP",
-              "Januari Sales",
-              "Februari Sales",
-              "Maret Sales",
-              "April Sales",
-              "Mei Sales",
-              "Juni Sales",
-              "Juli Sales",
-              "Agustus Sales",
-              "September Sales",
-              "Oktober Sales",
-              "November Sales",
-              "Desember Sales",
+    //     doc.autoTable({
+    //       theme: "striped",
+    //       head: [
+    //         [
+    //           "No",
+    //           "Distributor",
+    //           "Channel",
+    //           "Region",
+    //           "Area",
+    //           "Kode Cabang",
+    //           "Cabang",
+    //           "Parent Code",
+    //           "Item Code",
+    //           "SKU",
+    //           "Brand",
+    //           "Kategori",
+    //           "Status Product",
+    //           "YOP",
+    //           "Januari Sales",
+    //           "Februari Sales",
+    //           "Maret Sales",
+    //           "April Sales",
+    //           "Mei Sales",
+    //           "Juni Sales",
+    //           "Juli Sales",
+    //           "Agustus Sales",
+    //           "September Sales",
+    //           "Oktober Sales",
+    //           "November Sales",
+    //           "Desember Sales",
 
-              "Beli Januari",
-              "Beli Februari",
-              "Beli Maret",
-              "Beli April",
-              "Beli Mei",
-              "Beli Juni",
-              "Beli Juli",
-              "Beli Agustus",
-              "Beli September",
-              "Beli Oktober",
-              "Beli November",
-              "Beli Desember",
-              "Januari Stock",
-              "Februari Stock",
-              "Maret Stock",
-              "April Stock",
-              "Mei Stock",
-              "Juni Stock",
-              "Juli Stock",
-              "Agustus Stock",
-              "September Stock",
-              "Oktober Stock",
-              "November Stock",
-              "Desember Stock",
-            ],
-          ],
-          body: allData.map((item, index) => [
-            index + 1,
-            item.dist_code,
-            item.chnl_code,
-            item.region_name,
-            item.area_name,
-            item.kode_cabang,
-            item.nama_cabang,
-            item.parent_code,
-            item.item_code,
-            item.item_name,
-            item.brand_name,
-            item.kategori,
-            item.status_product,
-            item.tahun,
-            item.januari,
-            item.februari,
-            item.maret,
-            item.april,
-            item.mei,
-            item.juni,
-            item.juli,
-            item.agustus,
-            item.september,
-            item.oktober,
-            item.november,
-            item.desember,
+    //           "Beli Januari",
+    //           "Beli Februari",
+    //           "Beli Maret",
+    //           "Beli April",
+    //           "Beli Mei",
+    //           "Beli Juni",
+    //           "Beli Juli",
+    //           "Beli Agustus",
+    //           "Beli September",
+    //           "Beli Oktober",
+    //           "Beli November",
+    //           "Beli Desember",
+    //           "Januari Stock",
+    //           "Februari Stock",
+    //           "Maret Stock",
+    //           "April Stock",
+    //           "Mei Stock",
+    //           "Juni Stock",
+    //           "Juli Stock",
+    //           "Agustus Stock",
+    //           "September Stock",
+    //           "Oktober Stock",
+    //           "November Stock",
+    //           "Desember Stock",
+    //         ],
+    //       ],
+    //       body: allData.map((item, index) => [
+    //         index + 1,
+    //         item.dist_code,
+    //         item.chnl_code,
+    //         item.region_name,
+    //         item.area_name,
+    //         item.kode_cabang,
+    //         item.nama_cabang,
+    //         item.parent_code,
+    //         item.item_code,
+    //         item.item_name,
+    //         item.brand_name,
+    //         item.kategori,
+    //         item.status_product,
+    //         item.tahun,
+    //         item.januari,
+    //         item.februari,
+    //         item.maret,
+    //         item.april,
+    //         item.mei,
+    //         item.juni,
+    //         item.juli,
+    //         item.agustus,
+    //         item.september,
+    //         item.oktober,
+    //         item.november,
+    //         item.desember,
 
-            item.beli_januari,
-            item.beli_februari,
-            item.beli_maret,
-            item.beli_april,
-            item.beli_mei,
-            item.beli_juni,
-            item.beli_juli,
-            item.beli_agustus,
-            item.beli_september,
-            item.beli_oktober,
-            item.beli_november,
-            item.beli_desember,
-            item.januari1,
-            item.februari1,
-            item.maret1,
-            item.april1,
-            item.mei1,
-            item.juni1,
-            item.juli1,
-            item.agustus1,
-            item.september1,
-            item.oktober1,
-            item.november1,
-            item.desember1,
-          ]),
-          startY: 40, // Adjusted to accommodate the new information
-          didDrawPage: function (data) {
-            // Footer
-            let str = "Page " + doc.internal.getNumberOfPages();
-            if (typeof doc.putTotalPages === "function") {
-              str = str + " of " + totalPagesExp;
-            }
-            doc.setFontSize(10);
+    //         item.beli_januari,
+    //         item.beli_februari,
+    //         item.beli_maret,
+    //         item.beli_april,
+    //         item.beli_mei,
+    //         item.beli_juni,
+    //         item.beli_juli,
+    //         item.beli_agustus,
+    //         item.beli_september,
+    //         item.beli_oktober,
+    //         item.beli_november,
+    //         item.beli_desember,
+    //         item.januari1,
+    //         item.februari1,
+    //         item.maret1,
+    //         item.april1,
+    //         item.mei1,
+    //         item.juni1,
+    //         item.juli1,
+    //         item.agustus1,
+    //         item.september1,
+    //         item.oktober1,
+    //         item.november1,
+    //         item.desember1,
+    //       ]),
+    //       startY: 40, // Adjusted to accommodate the new information
+    //       didDrawPage: function (data) {
+    //         // Footer
+    //         let str = "Page " + doc.internal.getNumberOfPages();
+    //         if (typeof doc.putTotalPages === "function") {
+    //           str = str + " of " + totalPagesExp;
+    //         }
+    //         doc.setFontSize(10);
 
-            let pageSize = doc.internal.pageSize;
-            let pageHeight = pageSize.height
-              ? pageSize.height
-              : pageSize.getHeight();
-            doc.text(str, data.settings.margin.left, pageHeight - 10);
-          },
-          showHead: "everyPage",
-        });
+    //         let pageSize = doc.internal.pageSize;
+    //         let pageHeight = pageSize.height
+    //           ? pageSize.height
+    //           : pageSize.getHeight();
+    //         doc.text(str, data.settings.margin.left, pageHeight - 10);
+    //       },
+    //       showHead: "everyPage",
+    //     });
 
-        if (typeof doc.putTotalPages === "function") {
-          doc.putTotalPages(totalPagesExp);
-        }
+    //     if (typeof doc.putTotalPages === "function") {
+    //       doc.putTotalPages(totalPagesExp);
+    //     }
 
-        const fileName =
-          "Master_Trend_Analysis_Report_" +
-          mythis.formatDate(new Date()) +
-          ".pdf";
-        doc.save(fileName);
-        console.log(fileName + " generated");
+    //     const fileName =
+    //       "Master_Trend_Analysis_Report_" +
+    //       mythis.formatDate(new Date()) +
+    //       ".pdf";
+    //     doc.save(fileName);
+    //     console.log(fileName + " generated");
 
-        mythis.$root.stopLoading();
-        Swal.fire("Success", "PDF has been generated successfully", "success");
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        mythis.$root.stopLoading();
-        Swal.fire("Error", "Failed to generate PDF", "error");
-      }
-    },
+    //     mythis.$root.stopLoading();
+    //     Swal.fire("Success", "PDF has been generated successfully", "success");
+    //   } catch (error) {
+    //     console.error("Error generating PDF:", error);
+    //     mythis.$root.stopLoading();
+    //     Swal.fire("Error", "Failed to generate PDF", "error");
+    //   }
+    // },
 
     show_modal() {
       this.modal = !this.modal;
