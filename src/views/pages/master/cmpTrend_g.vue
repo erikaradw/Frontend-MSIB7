@@ -1183,7 +1183,7 @@ export default {
           sheet: "Sheet JS",
           bookType: "xls",
         });
-        XLSX.writeFile(wb, "TrendSalesWarehouse.xls");
+        XLSX.writeFile(wb, "Trend_Warehouse.xls");
 
         // this.$root.loader = true;
       } catch (error) {
