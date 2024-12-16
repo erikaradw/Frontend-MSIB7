@@ -1073,7 +1073,7 @@ export default {
     // await this.getStatusProductForm();
     // await this.fetchMonthlySalesData();
     await this.getAllDatas();
-    await this.getTrendTable();
+    // await this.getTrendTable(); 
     // await this.getSelectData();
   },
   methods: {
